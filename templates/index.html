@@ -3,72 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Find My</title>
+    <title>Digital Business Card Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
+    <!-- iOS Status Bar -->
+    <div class="ios-status-bar">
+        <div class="time">14:24</div>
+        <div class="status-icons">
+            <div class="signal"></div>
+            <div class="wifi"></div>
+            <div class="battery"></div>
+        </div>
+    </div>
     <div class="header">
-        <div class="back-button"><span class="back-arrow"></span>Back</div>
-        <div class="cancel-button">Cancel</div>
+        <button class="back-button"><span class="back-arrow"></span>Back</button>
+        <button class="cancel-button">Cancel</button>
     </div>
 
     <div class="modal-container">
-        <!-- Screen 1 -->
-        <div class="screen modal" id="screen1">
+        <!-- Screen 1: Welcome -->
+        <div class="screen" id="screen1">
             <div class="modal-content">
                 <div class="screen-background"></div>
-                <h1>What's New in<br>Find My</h1>
+                <h1>Generate Your<br>Digital Business Card</h1>
                 <div class="description">
-                    Get help finding a lost item by sharing its location with anyone or a locked contact. They will be able to see the location of your item for a time.
+                    Create a professional digital business card that you can share instantly. Your information will be converted into a QR code that anyone can scan.
                 </div>
-                <button class="ios-button">Continue</button>
+                
+              
+
+                <button class="ios-button continue-button">
+                    <span class="button-icon continue-icon"></span>
+                    Get Started
+                </button>
+                
                 <div class="footer-text">
-                    Information about you and the people you're sharing location with will only be used to help you share location and improve Find My. Your location will only be shared when you use Find My sharing features.
+                    Your information will be used only to generate a digital business card. No data is stored or shared with third parties.
                 </div>
             </div>
         </div>
 
-        <!-- Screen 2 -->
-        <div class="screen modal" id="screen2">
+        <!-- Screen 2: Form -->
+        <div class="screen" id="screen2">
             <div class="modal-content">
                 <div class="screen-background"></div>
-                <div class="icon-container">
-                    <img src="{{ url_for('static', filename='images/item-location.svg') }}" alt="Share Location Icon" class="screen-icon">
-                </div>
-                <h2>Share Item Location</h2>
-                <div class="description">
-                    Get help finding your lost item by sharing its location with anyone or a locked contact.
-                </div>
-                <div class="sub-description">
-                    The person who opens the link will be able to see the location of your item for a limited time.
-                </div>
-                <button class="ios-button">Continue</button>
-            </div>
-        </div>
-
-        <!-- Screen 3 -->
-        <div class="screen modal" id="screen3">
-            <div class="modal-content">
-                <div class="screen-background"></div>
-                <div class="icon-container">
-                    <img src="{{ url_for('static', filename='images/contact-info.svg') }}" alt="Contact Info Icon" class="screen-icon">
-                </div>
-                <h2>Show Contact Info</h2>
-                <div class="description">
-                    Connect to reveal information
-                </div>
-                <div class="setting-option">
-                    <div class="setting-icon"></div>
-                    <div class="setting-text">
-                        Allow others to get in touch
-                        <div class="setting-subtext">Add your email address or phone number so that the finder of this item can get in touch</div>
+                <h2>Enter Your Details</h2>
+                <form id="businessCardForm" class="ios-form">
+                    <div class="form-group">
+                        <div class="ios-input-wrapper">
+                            <input type="text" id="name" name="name" required class="ios-input">
+                            <label for="name">First Name</label>
+                        </div>
                     </div>
-                    <label class="ios-toggle">
-                        <input type="checkbox" checked>
-                        <span class="ios-toggle-slider"></span>
-                    </label>
+                    <div class="form-group">
+                        <div class="ios-input-wrapper">
+                            <input type="text" id="surname" name="surname" required class="ios-input">
+                            <label for="surname">Last Name</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="ios-input-wrapper">
+                            <input type="tel" id="phone" name="phone" required class="ios-input">
+                            <label for="phone">Phone Number</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="ios-input-wrapper">
+                            <textarea id="notes" name="notes" class="ios-textarea"></textarea>
+                            <label for="notes">Additional Notes</label>
+                        </div>
+                    </div>
+                </form>
+                <button class="ios-button" id="generateCard">
+                    <span class="button-icon generate-icon"></span>
+                    Generate Card
+                </button>
+            </div>
+        </div>
+
+        <!-- Screen 3: QR Code -->
+        <div class="screen" id="screen3">
+            <div class="modal-content">
+                <div class="screen-background"></div>
+                <h2>Your Digital Business Card</h2>
+                <div class="qr-container">
+                    <div id="qrCode"></div>
+                    <div class="loading-spinner"></div>
                 </div>
-                <button class="ios-button">Continue</button>
+                <div class="description">
+                    Scan this QR code to save the contact information
+                </div>
+                <button class="ios-button" id="downloadQR">
+                    <span class="button-icon download-icon"></span>
+                    Download QR Code
+                </button>
             </div>
         </div>
         

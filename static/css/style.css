@@ -6,6 +6,10 @@
     --ios-button-height: 50px;
     --modal-border-radius: 12px;
     --modal-padding: 16px;
+    --ios-input-background: rgba(118, 118, 128, 0.24);
+    --ios-input-text: #FFFFFF;
+    --ios-input-placeholder: rgba(235, 235, 245, 0.6);
+    --ios-error: #FF3B30;
 }
 
 * {
@@ -47,10 +51,15 @@
     to { transform: scale(1); opacity: 1; }
 }
 
-@keyframes iconPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
 }
 
 body {
@@ -61,9 +70,98 @@ body {
     overflow: hidden;
 }
 
-.header {
+/* iOS Status Bar */
+.ios-status-bar {
     position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
+    height: 44px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1001;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.time {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.status-icons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.signal {
+    width: 18px;
+    height: 12px;
+    position: relative;
+}
+
+.signal::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--ios-text);
+    clip-path: polygon(0 100%, 0 40%, 20% 40%, 20% 30%, 40% 30%, 40% 20%, 60% 20%, 60% 10%, 80% 10%, 80% 0, 100% 0, 100% 100%);
+}
+
+.wifi {
+    width: 16px;
+    height: 12px;
+    position: relative;
+}
+
+.wifi::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--ios-text);
+    border-radius: 50%;
+    clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+    transform: rotate(45deg);
+}
+
+.battery {
+    width: 24px;
+    height: 12px;
+    border: 1px solid var(--ios-text);
+    border-radius: 3px;
+    padding: 1px;
+    display: flex;
+    align-items: center;
+}
+
+.battery::after {
+    content: '';
+    display: block;
+    width: 80%;
+    height: 100%;
+    background: var(--ios-text);
+    border-radius: 1px;
+}
+
+.battery::before {
+    content: '';
+    position: absolute;
+    right: -4px;
+    width: 2px;
+    height: 4px;
+    background: var(--ios-text);
+    border-radius: 0 2px 2px 0;
+}
+
+.header {
+    position: fixed;
+    top: 44px;
     left: 0;
     right: 0;
     height: 44px;
@@ -71,7 +169,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0 16px;
-    z-index: 10;
+    z-index: 1000;
 }
 
 .back-button, .cancel-button {
@@ -84,6 +182,9 @@ body {
     gap: 4px;
     opacity: 0;
     animation: fadeIn 0.3s forwards;
+    background: none;
+    border: none;
+    padding: 8px;
 }
 
 .back-button:active, .cancel-button:active {
@@ -103,24 +204,27 @@ body {
     height: 100vh;
     position: relative;
     overflow: hidden;
+    padding-top: 88px;
 }
 
-.modal {
+.screen {
     position: absolute;
     width: 100%;
-    height: 100%;
-    top: 0;
+    height: calc(100% - 88px);
+    top: 88px;
     left: 0;
     display: none;
     opacity: 0;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
-.modal.active {
+.screen.active {
     display: block;
     animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-.modal.exit {
+.screen.exit {
     display: block;
     animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
@@ -130,7 +234,6 @@ body {
     border-radius: var(--modal-border-radius) var(--modal-border-radius) 0 0;
     padding: var(--modal-padding);
     height: 100%;
-    margin: 60px 0 0 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -147,22 +250,10 @@ body {
     width: 100%;
     max-height: 50vh;
     background-size: cover;
-    background-position: center center;
+    background-position: center;
     opacity: 0.15;
     z-index: -1;
     filter: blur(20px);
-}
-
-#screen1 .screen-background {
-    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.95));
-}
-
-#screen2 .screen-background {
-    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.85), rgba(0, 122, 255, 0.1));
-}
-
-#screen3 .screen-background {
-    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.85), rgba(128, 128, 128, 0.1));
 }
 
 h1 {
@@ -189,14 +280,6 @@ h2 {
     animation: fadeIn 0.6s 0.3s both;
 }
 
-.sub-description {
-    font-size: 15px;
-    color: var(--ios-secondary-text);
-    margin-bottom: 24px;
-    padding: 0 16px;
-    animation: fadeIn 0.6s 0.4s both;
-}
-
 .ios-button {
     width: calc(100% - 32px);
     height: var(--ios-button-height);
@@ -213,11 +296,44 @@ h2 {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     animation: scaleIn 0.6s 0.5s both;
     will-change: transform;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .ios-button:active {
     transform: scale(0.98);
     opacity: 0.9;
+}
+
+.button-icon {
+    width: 20px;
+    height: 20px;
+    position: relative;
+}
+
+.download-icon::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-top: none;
+    border-right: none;
+    transform: rotate(-45deg);
+    top: 0;
+    left: 4px;
+}
+
+.download-icon::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 14px;
+    background: currentColor;
+    top: 0;
+    left: 9px;
 }
 
 .footer-text {
@@ -228,24 +344,110 @@ h2 {
     animation: fadeIn 0.6s 0.6s both;
 }
 
-.icon-container {
-    width: 100px;
-    height: 100px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
+/* Form styles */
+.ios-form {
+    width: 100%;
+    padding: 0 16px;
+    margin: 24px 0;
+}
+
+.form-group {
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+.ios-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.ios-input, .ios-textarea {
+    width: 100%;
+    background-color: var(--ios-input-background);
+    border: none;
+    border-radius: 10px;
+    padding: 20px 16px 8px;
+    font-size: 17px;
+    color: var(--ios-input-text);
+    transition: all 0.3s ease;
+}
+
+.ios-input-wrapper label {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    font-size: 17px;
+    color: var(--ios-input-placeholder);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.ios-input:focus + label,
+.ios-input:not(:placeholder-shown) + label,
+.ios-textarea:focus + label,
+.ios-textarea:not(:placeholder-shown) + label {
+    top: 8px;
+    font-size: 12px;
+    color: var(--ios-blue);
+}
+
+.ios-input:focus,
+.ios-textarea:focus {
+    outline: none;
+    background-color: rgba(118, 118, 128, 0.32);
+    box-shadow: 0 0 0 1px var(--ios-blue);
+}
+
+.ios-textarea {
+    min-height: 100px;
+    resize: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+}
+
+/* QR Code container */
+.qr-container {
+    background-color: #FFFFFF;
+    padding: 24px;
+    border-radius: 16px;
+    margin: 24px auto;
+    width: fit-content;
+    max-width: 90%;
     display: flex;
-    align-items: center;
     justify-content: center;
-    margin-top: 32px;
-    animation: scaleIn 0.6s 0.1s both;
+    align-items: center;
+    position: relative;
+    min-height: 200px;
+    animation: scaleIn 0.6s 0.3s both;
 }
 
-.screen-icon {
-    width: 48px;
-    height: 48px;
-    animation: iconPulse 2s infinite ease-in-out;
+#qrCode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
+#qrCode img {
+    max-width: 100%;
+    height: auto;
+    animation: scaleIn 0.3s ease-out;
+}
+
+.loading-spinner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 122, 255, 0.1);
+    border-left-color: var(--ios-blue);
+    border-radius: 50%;
+    animation: rotate 1s linear infinite;
+    display: none;
+}
+
+.loading .loading-spinner {
+    display: block;
+}
+
+/* Pagination */
 .pagination {
     position: fixed;
     bottom: 16px;
@@ -422,94 +624,352 @@ h2 {
     border-radius: 0 2px 2px 0;
 }
 
-/* JavaScript part */
-
-const modalContainer = document.querySelector('.modal-container');
-const modal = document.querySelector('.modal');
-const modalContent = document.querySelector('.modal-content');
-const screens = document.querySelectorAll('.screen');
-
-let currentScreen = 0;
-
-// Function to open the modal
-function openModal() {
-  modal.classList.add('active');
-  modalContainer.style.overflow = 'hidden';
+/* Add new form styles */
+.ios-form {
+    width: 100%;
+    padding: 0 16px;
+    margin-bottom: 24px;
 }
 
-// Function to close the modal
-function closeModal() {
-  modal.classList.remove('active');
-  modal.classList.add('exit');
-  setTimeout(() => {
-    modal.classList.remove('exit');
-    modalContainer.style.overflow = 'auto';
-  }, 500); // 500ms delay for the exit animation
+.form-group {
+    margin-bottom: 16px;
+    width: 100%;
 }
 
-// Function to move to the next screen
-function nextScreen() {
-  if (currentScreen < screens.length - 1) {
-    currentScreen++;
-    screens[currentScreen - 1].style.display = 'none';
-    screens[currentScreen].style.display = 'flex';
-    updatePagination();
-  }
+.ios-input, .ios-textarea {
+    width: 100%;
+    background-color: var(--ios-input-background);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 17px;
+    color: var(--ios-input-text);
+    transition: all 0.3s ease;
 }
 
-// Function to move to the previous screen
-function previousScreen() {
-  if (currentScreen > 0) {
-    currentScreen--;
-    screens[currentScreen + 1].style.display = 'none';
-    screens[currentScreen].style.display = 'flex';
-    updatePagination();
-  }
+.ios-input::placeholder, .ios-textarea::placeholder {
+    color: var(--ios-input-placeholder);
 }
 
-// Function to update the pagination dots
-function updatePagination() {
-  const dots = document.querySelectorAll('.dot');
-  dots.forEach((dot, index) => {
-    if (index === currentScreen) {
-      dot.classList.add('active');
-    } else {
-      dot.classList.remove('active');
+.ios-input:focus, .ios-textarea:focus {
+    outline: none;
+    background-color: rgba(118, 118, 128, 0.32);
+}
+
+.ios-textarea {
+    min-height: 100px;
+    resize: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+}
+
+/* QR Code styles */
+.qr-container {
+    background-color: #FFFFFF;
+    padding: 24px;
+    border-radius: 16px;
+    margin: 24px auto;
+    width: fit-content;
+    max-width: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: scaleIn 0.6s 0.3s both;
+}
+
+#qrCode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#qrCode img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* iOS Alert */
+.ios-alert {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.ios-alert.show {
+    opacity: 1;
+}
+
+.ios-alert-content {
+    background: rgba(28, 28, 30, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 14px;
+    width: 270px;
+    padding: 20px;
+    animation: alertIn 0.3s ease-out;
+}
+
+@keyframes alertIn {
+    from {
+        transform: scale(1.2);
+        opacity: 0;
     }
-  });
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
-// Event listeners for the buttons
-const nextButton = document.getElementById('nextButton');
-const prevButton = document.getElementById('prevButton');
-const closeButton = document.querySelector('.close-button');
-
-if (nextButton) {
-  nextButton.addEventListener('click', nextScreen);
+.ios-alert h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-align: center;
 }
 
-if (prevButton) {
-  prevButton.addEventListener('click', previousScreen);
+.ios-alert p {
+    font-size: 13px;
+    color: var(--ios-secondary-text);
+    margin-bottom: 20px;
+    text-align: center;
+    line-height: 1.4;
 }
 
-if (closeButton) {
-  closeButton.addEventListener('click', closeModal);
+.ios-alert-button {
+    width: 100%;
+    background: var(--ios-blue);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-// Event listener for the modal container
-modalContainer.addEventListener('click', (event) => {
-  if (event.target === modalContainer) {
-    closeModal();
-  }
+.ios-alert-button:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+/* Form Error States */
+.ios-input-wrapper.error .ios-input,
+.ios-input-wrapper.error .ios-textarea {
+    border: 1px solid var(--ios-error);
+    box-shadow: 0 0 0 1px var(--ios-error);
+}
+
+.ios-input-wrapper.error label {
+    color: var(--ios-error);
+}
+
+.error-message {
+    color: var(--ios-error);
+    font-size: 12px;
+    margin-top: 4px;
+    padding-left: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Touch Feedback */
+.ios-input.touch-active,
+.ios-textarea.touch-active {
+    background-color: rgba(118, 118, 128, 0.32);
+}
+
+.ios-button.touch-active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+/* Success Message */
+.success-message {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(52, 199, 89, 0.9);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    animation: slideUp 0.3s ease, fadeOut 0.3s ease 2.7s;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
+}
+
+/* Error Text */
+.error-text {
+    color: var(--ios-error);
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* Loading Spinner Improvements */
+.loading-spinner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 122, 255, 0.1);
+    border-left-color: var(--ios-blue);
+    border-radius: 50%;
+    animation: rotate 1s linear infinite;
+    display: none;
+}
+
+.loading .loading-spinner {
+    display: block;
+}
+
+.qr-container.loading #qrCode {
+    opacity: 0.3;
+}
+
+/* Prevent text selection during dragging */
+.screen {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* JavaScript part */
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const modalContainer = document.querySelector('.modal-container');
+    const modal = document.querySelector('.modal');
+    const modalContent = document.querySelector('.modal-content');
+    const screens = document.querySelectorAll('.screen');
+    const nextButton = document.getElementById('nextButton');
+    const prevButton = document.getElementById('prevButton');
+    const closeButton = document.querySelector('.close-button');
+    const timeElement = document.querySelector('.time');
+
+    let currentScreen = 0;
+
+    // Function to open the modal
+    function openModal() {
+        if (modal) {
+            modal.classList.add('active');
+            if (modalContainer) {
+                modalContainer.style.overflow = 'hidden';
+            }
+        }
+    }
+
+    // Function to close the modal
+    function closeModal() {
+        if (modal) {
+            modal.classList.remove('active');
+            modal.classList.add('exit');
+            setTimeout(() => {
+                if (modal) {
+                    modal.classList.remove('exit');
+                }
+                if (modalContainer) {
+                    modalContainer.style.overflow = 'auto';
+                }
+            }, 500); // 500ms delay for the exit animation
+        }
+    }
+
+    // Function to move to the next screen
+    function nextScreen() {
+        if (currentScreen < screens.length - 1) {
+            currentScreen++;
+            if (screens[currentScreen - 1]) {
+                screens[currentScreen - 1].style.display = 'none';
+            }
+            if (screens[currentScreen]) {
+                screens[currentScreen].style.display = 'flex';
+            }
+            updatePagination();
+        }
+    }
+
+    // Function to move to the previous screen
+    function previousScreen() {
+        if (currentScreen > 0) {
+            currentScreen--;
+            if (screens[currentScreen + 1]) {
+                screens[currentScreen + 1].style.display = 'none';
+            }
+            if (screens[currentScreen]) {
+                screens[currentScreen].style.display = 'flex';
+            }
+            updatePagination();
+        }
+    }
+
+    // Function to update the pagination dots
+    function updatePagination() {
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, index) => {
+            if (index === currentScreen) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
+    // Update the time in the status bar
+    function updateTime() {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        timeElement.textContent = `${hours}:${minutes}`;
+    }
+
+    // Initial setup
+    if (screens[currentScreen]) {
+        screens[currentScreen].style.display = 'flex';
+    }
+    updatePagination();
+
+    // Update the time every second
+    setInterval(updateTime, 1000);
+
+    openModal();
+
+    // Event listeners for the buttons
+    if (nextButton) {
+        nextButton.addEventListener('click', nextScreen);
+    }
+
+    if (prevButton) {
+        prevButton.addEventListener('click', previousScreen);
+    }
+
+    if (closeButton) {
+        closeButton.addEventListener('click', closeModal);
+    }
+
+    // Event listener for the modal container
+    if (modalContainer) {
+        modalContainer.addEventListener('click', (event) => {
+            if (event.target === modalContainer) {
+                closeModal();
+            }
+        });
+    }
+
+    // Event listener for the modal content
+    if (modalContent) {
+        modalContent.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent the event from bubbling up to the modal container
+        });
+    }
 });
-
-// Event listener for the modal content
-modalContent.addEventListener('click', (event) => {
-  event.stopPropagation(); // Prevent the event from bubbling up to the modal container
-});
-
-// Initial setup
-screens[currentScreen].style.display = 'flex';
-updatePagination();
-
-openModal();
+</script>

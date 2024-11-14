@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Get DOM elements
     const carousel = document.querySelector('.carousel');
     const screens = document.querySelectorAll('.screen');
     const dots = document.querySelectorAll('.dot');
@@ -19,33 +20,34 @@ document.addEventListener('DOMContentLoaded', () => {
     let isDragging = false;
 
     // Set initial active screen
-    screens[0].classList.add('active');
+    if (screens[0]) {
+        screens[0].classList.add('active');
+    }
 
     function updateCarousel(animate = true) {
         if (!carousel) return;
 
-        if (animate) {
-            carousel.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
-        } else {
-            carousel.style.transition = 'none';
-        }
-        
+        carousel.style.transition = animate ? 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
         carousel.style.transform = `translateX(-${currentScreen * 100}%)`;
         
         // Update active states and animations
         screens.forEach((screen, index) => {
-            if (index === currentScreen) {
-                screen.classList.add('active');
-            } else {
-                screen.classList.remove('active');
+            if (screen) {
+                if (index === currentScreen) {
+                    screen.classList.add('active');
+                } else {
+                    screen.classList.remove('active');
+                }
             }
         });
 
         dots.forEach((dot, index) => {
-            if (index === currentScreen) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
+            if (dot) {
+                if (index === currentScreen) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
             }
         });
 
@@ -56,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleTouchStart(e) {
-        if (!carousel) return;
+        if (!carousel || !e.touches) return;
         isDragging = true;
         startX = e.touches[0].clientX;
         currentX = startX;
@@ -64,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleTouchMove(e) {
-        if (!isDragging || !carousel) return;
+        if (!isDragging || !carousel || !e.touches) return;
         
         e.preventDefault();
         currentX = e.touches[0].clientX;
@@ -103,19 +105,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add event listeners only if elements exist
     if (buttons.length) {
         buttons.forEach((button, index) => {
-            button.addEventListener('click', () => {
-                if (index < screens.length - 1) {
-                    button.style.transform = 'scale(0.98)';
-                    button.style.opacity = '0.9';
-                    
-                    setTimeout(() => {
-                        button.style.transform = '';
-                        button.style.opacity = '';
-                        currentScreen++;
-                        updateCarousel(true);
-                    }, 150);
-                }
-            });
+            if (button) {
+                button.addEventListener('click', () => {
+                    if (index < screens.length - 1) {
+                        button.style.transform = 'scale(0.98)';
+                        button.style.opacity = '0.9';
+                        
+                        setTimeout(() => {
+                            button.style.transform = '';
+                            button.style.opacity = '';
+                            currentScreen++;
+                            updateCarousel(true);
+                        }, 150);
+                    }
+                });
+            }
         });
     }
 

@@ -5,7 +5,7 @@
     --ios-secondary-text: rgba(255, 255, 255, 0.6);
     --ios-button-height: 50px;
     --modal-border-radius: 12px;
-    --modal-padding: 20px;
+    --modal-padding: 16px;
 }
 
 * {
@@ -21,14 +21,14 @@
         opacity: 0;
     }
     to { 
-        transform: translateY(0);
+        transform: translateY(15vh);
         opacity: 1;
     }
 }
 
 @keyframes slideDown {
     from { 
-        transform: translateY(0);
+        transform: translateY(15vh);
         opacity: 1;
     }
     to { 
@@ -129,7 +129,9 @@ body {
     background-color: rgba(28, 28, 30, 0.95);
     border-radius: var(--modal-border-radius);
     padding: var(--modal-padding);
-    min-height: 100%;
+    max-height: 85vh;
+    height: auto;
+    margin: 0 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -165,17 +167,17 @@ body {
 }
 
 h1 {
-    font-size: 34px;
+    font-size: 32px;
     font-weight: 700;
-    margin: 40px 0;
+    margin: 24px 0;
     line-height: 1.2;
     animation: fadeIn 0.6s 0.2s both;
 }
 
 h2 {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 600;
-    margin: 24px 0;
+    margin: 20px 0;
     animation: fadeIn 0.6s 0.2s both;
 }
 
@@ -183,21 +185,21 @@ h2 {
     font-size: 17px;
     line-height: 1.4;
     color: var(--ios-secondary-text);
-    margin-bottom: 20px;
-    padding: 0 20px;
+    margin-bottom: 16px;
+    padding: 0 16px;
     animation: fadeIn 0.6s 0.3s both;
 }
 
 .sub-description {
     font-size: 15px;
     color: var(--ios-secondary-text);
-    margin-bottom: 40px;
-    padding: 0 20px;
+    margin-bottom: 24px;
+    padding: 0 16px;
     animation: fadeIn 0.6s 0.4s both;
 }
 
 .ios-button {
-    width: calc(100% - 40px);
+    width: calc(100% - 32px);
     height: var(--ios-button-height);
     background-color: var(--ios-blue);
     border: none;
@@ -206,7 +208,7 @@ h2 {
     font-size: 17px;
     font-weight: 600;
     margin-top: auto;
-    margin-bottom: 40px;
+    margin-bottom: 24px;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     animation: scaleIn 0.6s 0.5s both;
@@ -221,30 +223,32 @@ h2 {
 .footer-text {
     font-size: 12px;
     color: var(--ios-secondary-text);
-    padding: 0 20px;
-    margin-bottom: 20px;
+    padding: 0 16px;
+    margin-bottom: 16px;
     animation: fadeIn 0.6s 0.6s both;
 }
 
 .icon-container {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 30px;
+    border-radius: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 60px;
+    margin-top: 32px;
     animation: scaleIn 0.6s 0.1s both;
 }
 
 .screen-icon {
+    width: 48px;
+    height: 48px;
     animation: iconPulse 2s infinite ease-in-out;
 }
 
 .pagination {
-    position: absolute;
-    bottom: 20px;
+    position: fixed;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -274,7 +278,7 @@ h2 {
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    margin: 20px 0;
+    margin: 16px 0;
     animation: scaleIn 0.6s 0.4s both;
     transition: transform 0.3s ease;
 }
@@ -284,6 +288,7 @@ h2 {
     height: 24px;
     background: var(--ios-blue);
     border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .setting-text {

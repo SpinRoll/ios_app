@@ -108,24 +108,23 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100%;
-    height: 50vh;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 0.2;
+    max-height: 50vh;
+    background-size: cover;
+    background-position: center center;
+    opacity: 0.25;
     z-index: -1;
 }
 
 #screen1 .screen-background {
-    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.95)), url('../images/rocket-league-car.jpg') center/contain no-repeat;
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.95)), url('../images/rocket-league-car.jpg') center/cover no-repeat;
 }
 
 #screen2 .screen-background {
-    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.85), rgba(0, 122, 255, 0.2)), url('../images/rocket-league-car.jpg') center/contain no-repeat;
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.85), rgba(0, 122, 255, 0.2)), url('../images/rocket-league-car.jpg') center/cover no-repeat;
 }
 
 #screen3 .screen-background {
-    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.85), rgba(128, 128, 128, 0.2)), url('../images/rocket-league-car.jpg') center/contain no-repeat;
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.85), rgba(128, 128, 128, 0.2)), url('../images/rocket-league-car.jpg') center/cover no-repeat;
 }
 
 .screen.active {

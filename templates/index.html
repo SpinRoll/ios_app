@@ -12,10 +12,10 @@
         <div class="cancel-button">Cancel</div>
     </div>
 
-    <div class="carousel-container">
-        <div class="carousel">
-            <!-- Screen 1 -->
-            <div class="screen" id="screen1">
+    <div class="modal-container">
+        <!-- Screen 1 -->
+        <div class="screen modal" id="screen1">
+            <div class="modal-content">
                 <div class="screen-background"></div>
                 <h1>What's New in<br>Find My</h1>
                 <div class="description">
@@ -26,9 +26,11 @@
                     Information about you and the people you're sharing location with will only be used to help you share location and improve Find My. Your location will only be shared when you use Find My sharing features.
                 </div>
             </div>
+        </div>
 
-            <!-- Screen 2 -->
-            <div class="screen" id="screen2">
+        <!-- Screen 2 -->
+        <div class="screen modal" id="screen2">
+            <div class="modal-content">
                 <div class="screen-background"></div>
                 <div class="icon-container">
                     <img src="{{ url_for('static', filename='images/item-location.svg') }}" alt="Share Location Icon" class="screen-icon">
@@ -42,9 +44,11 @@
                 </div>
                 <button class="ios-button">Continue</button>
             </div>
+        </div>
 
-            <!-- Screen 3 -->
-            <div class="screen" id="screen3">
+        <!-- Screen 3 -->
+        <div class="screen modal" id="screen3">
+            <div class="modal-content">
                 <div class="screen-background"></div>
                 <div class="icon-container">
                     <img src="{{ url_for('static', filename='images/contact-info.svg') }}" alt="Contact Info Icon" class="screen-icon">

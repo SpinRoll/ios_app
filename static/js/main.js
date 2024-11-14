@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize DOM elements with error handling
     let elements = {
-        carousel: null,
+        modalContainer: null,
         screens: [],
         dots: [],
         buttons: [],
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         // Query all required elements
         elements = {
-            carousel: document.querySelector('.carousel'),
+            modalContainer: document.querySelector('.modal-container'),
             screens: Array.from(document.querySelectorAll('.screen') || []),
             dots: Array.from(document.querySelectorAll('.dot') || []),
             buttons: Array.from(document.querySelectorAll('.ios-button') || []),
@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         // Validate required elements
-        if (!elements.carousel) {
-            throw new Error('Carousel element not found');
+        if (!elements.modalContainer) {
+            throw new Error('Modal container element not found');
         }
         if (elements.screens.length === 0) {
             throw new Error('No screen elements found');
@@ -40,9 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // State management
     let state = {
         currentScreen: 0,
-        startX: 0,
-        currentX: 0,
-        isDragging: false
+        startY: 0,
+        currentY: 0,
+        isDragging: false,
+        isAnimating: false
     };
 
     // Set initial states
@@ -55,44 +56,63 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Error setting initial states:', error);
     }
 
-    function updateCarousel(animate = true) {
+    function updateScreen(direction = 'next') {
+        if (state.isAnimating) return;
+        
         try {
-            if (!elements.carousel) return;
+            state.isAnimating = true;
+            const currentScreen = elements.screens[state.currentScreen];
+            const nextScreenIndex = direction === 'next' ? 
+                state.currentScreen + 1 : 
+                state.currentScreen - 1;
+            
+            if (nextScreenIndex < 0 || nextScreenIndex >= elements.screens.length) {
+                state.isAnimating = false;
+                return;
+            }
 
-            // Update carousel transform
-            elements.carousel.style.transition = animate ? 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
-            elements.carousel.style.transform = `translateX(-${state.currentScreen * 100}%)`;
+            const nextScreen = elements.screens[nextScreenIndex];
+            
+            if (!currentScreen || !nextScreen) {
+                state.isAnimating = false;
+                return;
+            }
 
-            // Update screen states
-            elements.screens.forEach((screen, index) => {
-                if (screen) {
-                    screen.classList.toggle('active', index === state.currentScreen);
-                }
-            });
+            // Update screens
+            currentScreen.classList.remove('active');
+            currentScreen.classList.add('exit');
+            nextScreen.classList.add('active');
 
-            // Update dot states
+            // Update dots
             elements.dots.forEach((dot, index) => {
                 if (dot) {
-                    dot.classList.toggle('active', index === state.currentScreen);
+                    dot.classList.toggle('active', index === nextScreenIndex);
                 }
             });
 
             // Update back button visibility
             if (elements.backButton) {
-                elements.backButton.style.display = state.currentScreen > 0 ? 'flex' : 'none';
+                elements.backButton.style.display = nextScreenIndex > 0 ? 'flex' : 'none';
             }
+
+            // Update state after animation
+            setTimeout(() => {
+                currentScreen.classList.remove('exit');
+                state.currentScreen = nextScreenIndex;
+                state.isAnimating = false;
+            }, 500);
         } catch (error) {
-            console.warn('Error updating carousel:', error);
+            console.warn('Error updating screen:', error);
+            state.isAnimating = false;
         }
     }
 
     function handleTouchStart(e) {
         try {
-            if (!e.touches || !elements.carousel) return;
+            if (!e.touches) return;
             state.isDragging = true;
-            state.startX = e.touches[0].clientX;
-            state.currentX = state.startX;
-            elements.carousel.style.transition = 'none';
+            state.startY = e.touches[0].clientY;
+            state.currentY = state.startY;
         } catch (error) {
             console.warn('Error handling touch start:', error);
         }
@@ -100,22 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleTouchMove(e) {
         try {
-            if (!state.isDragging || !elements.carousel || !e.touches) return;
-
+            if (!state.isDragging || !e.touches) return;
             e.preventDefault();
-            state.currentX = e.touches[0].clientX;
-            const diff = state.currentX - state.startX;
-            const translateX = (-state.currentScreen * 100) + (diff / window.innerWidth * 100);
-
-            // Add resistance at edges
-            if (translateX > 0) {
-                elements.carousel.style.transform = `translateX(${translateX * 0.3}%)`;
-            } else if (translateX < -((elements.screens.length - 1) * 100)) {
-                const overscroll = translateX + ((elements.screens.length - 1) * 100);
-                elements.carousel.style.transform = `translateX(${-((elements.screens.length - 1) * 100) + (overscroll * 0.3)}%)`;
-            } else {
-                elements.carousel.style.transform = `translateX(${translateX}%)`;
-            }
+            state.currentY = e.touches[0].clientY;
         } catch (error) {
             console.warn('Error handling touch move:', error);
         }
@@ -123,21 +130,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleTouchEnd() {
         try {
-            if (!state.isDragging || !elements.carousel) return;
-
+            if (!state.isDragging) return;
+            
             state.isDragging = false;
-            const diff = state.currentX - state.startX;
-            const threshold = window.innerWidth * 0.2;
+            const diff = state.currentY - state.startY;
+            const threshold = window.innerHeight * 0.2;
 
             if (Math.abs(diff) > threshold) {
                 if (diff > 0 && state.currentScreen > 0) {
-                    state.currentScreen--;
+                    updateScreen('prev');
                 } else if (diff < 0 && state.currentScreen < elements.screens.length - 1) {
-                    state.currentScreen++;
+                    updateScreen('next');
                 }
             }
-
-            updateCarousel(true);
         } catch (error) {
             console.warn('Error handling touch end:', error);
         }
@@ -145,11 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add event listeners with error handling
     try {
-        // Touch events for carousel
-        if (elements.carousel) {
-            elements.carousel.addEventListener('touchstart', handleTouchStart, { passive: false });
-            elements.carousel.addEventListener('touchmove', handleTouchMove, { passive: false });
-            elements.carousel.addEventListener('touchend', handleTouchEnd);
+        // Touch events for modal container
+        if (elements.modalContainer) {
+            elements.modalContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+            elements.modalContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+            elements.modalContainer.addEventListener('touchend', handleTouchEnd);
         }
 
         // Continue buttons
@@ -163,8 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         setTimeout(() => {
                             button.style.transform = '';
                             button.style.opacity = '';
-                            state.currentScreen++;
-                            updateCarousel(true);
+                            updateScreen('next');
                         }, 150);
                     } catch (error) {
                         console.warn('Error handling button click:', error);
@@ -178,8 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.backButton.addEventListener('click', () => {
                 try {
                     if (state.currentScreen > 0) {
-                        state.currentScreen--;
-                        updateCarousel(true);
+                        updateScreen('prev');
                     }
                 } catch (error) {
                     console.warn('Error handling back button:', error);
@@ -191,8 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elements.cancelButton) {
             elements.cancelButton.addEventListener('click', () => {
                 try {
-                    state.currentScreen = 0;
-                    updateCarousel(true);
+                    while (state.currentScreen > 0) {
+                        updateScreen('prev');
+                    }
                 } catch (error) {
                     console.warn('Error handling cancel button:', error);
                 }
@@ -223,17 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, { passive: false });
 
-        // Handle visibility change
-        document.addEventListener('visibilitychange', () => {
-            try {
-                const currentScreenEl = elements.screens[state.currentScreen];
-                if (!document.hidden && currentScreenEl) {
-                    currentScreenEl.classList.add('active');
-                }
-            } catch (error) {
-                console.warn('Error handling visibility change:', error);
-            }
-        });
     } catch (error) {
         console.warn('Error setting up event listeners:', error);
     }

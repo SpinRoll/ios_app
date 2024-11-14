@@ -4,6 +4,8 @@
     --ios-text: #FFFFFF;
     --ios-secondary-text: rgba(255, 255, 255, 0.6);
     --ios-button-height: 50px;
+    --modal-border-radius: 12px;
+    --modal-padding: 20px;
 }
 
 * {
@@ -13,9 +15,31 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+@keyframes slideUp {
+    from { 
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to { 
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes scaleIn {
@@ -59,7 +83,7 @@ body {
     align-items: center;
     gap: 4px;
     opacity: 0;
-    animation: fadeIn 0.5s forwards;
+    animation: fadeIn 0.3s forwards;
 }
 
 .back-button:active, .cancel-button:active {
@@ -75,29 +99,41 @@ body {
     margin-right: 4px;
 }
 
-.carousel-container {
+.modal-container {
     height: 100vh;
     position: relative;
+    overflow: hidden;
 }
 
-.carousel {
+.modal {
+    position: absolute;
+    width: 100%;
     height: 100%;
-    display: flex;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: transform;
+    top: 0;
+    left: 0;
+    display: none;
+    opacity: 0;
 }
 
-.screen {
-    min-width: 100vw;
-    height: 100%;
-    padding: 20px;
+.modal.active {
+    display: block;
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.modal.exit {
+    display: block;
+    animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.modal-content {
+    background-color: rgba(28, 28, 30, 0.95);
+    border-radius: var(--modal-border-radius);
+    padding: var(--modal-padding);
+    min-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeIn 0.6s forwards;
     position: relative;
     overflow: hidden;
 }
@@ -111,25 +147,21 @@ body {
     max-height: 50vh;
     background-size: cover;
     background-position: center center;
-    opacity: 0.25;
+    opacity: 0.15;
     z-index: -1;
+    filter: blur(20px);
 }
 
 #screen1 .screen-background {
-    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.95)), url('../images/rocket-league-car.jpg') center/cover no-repeat;
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.95));
 }
 
 #screen2 .screen-background {
-    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.85), rgba(0, 122, 255, 0.2)), url('../images/rocket-league-car.jpg') center/cover no-repeat;
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.85), rgba(0, 122, 255, 0.1));
 }
 
 #screen3 .screen-background {
-    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.85), rgba(128, 128, 128, 0.2)), url('../images/rocket-league-car.jpg') center/cover no-repeat;
-}
-
-.screen.active {
-    opacity: 1;
-    transform: translateY(0);
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(26, 26, 26, 0.85), rgba(128, 128, 128, 0.1));
 }
 
 h1 {
@@ -197,18 +229,13 @@ h2 {
 .icon-container {
     width: 120px;
     height: 120px;
-    background: #1C1C1E;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 60px;
     animation: scaleIn 0.6s 0.1s both;
-    transition: transform 0.3s ease;
-}
-
-.icon-container:active {
-    transform: scale(0.95);
 }
 
 .screen-icon {
@@ -222,6 +249,7 @@ h2 {
     transform: translateX(-50%);
     display: flex;
     gap: 8px;
+    z-index: 20;
     animation: fadeIn 0.6s 0.7s both;
 }
 
@@ -241,7 +269,7 @@ h2 {
 .setting-option {
     width: 100%;
     padding: 16px;
-    background: #1C1C1E;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     display: flex;
     align-items: flex-start;
@@ -249,11 +277,6 @@ h2 {
     margin: 20px 0;
     animation: scaleIn 0.6s 0.4s both;
     transition: transform 0.3s ease;
-    cursor: pointer;
-}
-
-.setting-option:active {
-    transform: scale(0.98);
 }
 
 .setting-icon {

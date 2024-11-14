@@ -7,6 +7,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Digital Business Card">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
     
     <!-- PWA manifest -->
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
@@ -23,29 +26,47 @@
     
     <title>Digital Business Card Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js" integrity="sha384-0ENW7c3wCCA5oZHHp5HhloKH2TnLc1fJfQY7GCNcZb2dqHGnHVQcEGM8OZKGLlK" crossorigin="anonymous"></script>
 </head>
 <body>
+    <!-- iOS Status Bar -->
+    <div class="ios-status-bar">
+        <div class="time">14:46</div>
+        <div class="status-icons">
+            <div class="signal"></div>
+            <div class="wifi"></div>
+            <div class="battery"></div>
+        </div>
+    </div>
 
-
-    <div class="header">
+    <!-- iOS Navigation Bar -->
+    <div class="ios-nav-bar">
         <button class="back-button"><span class="back-arrow"></span>Back</button>
+        <div class="nav-title">Digital Card</div>
         <button class="cancel-button">Cancel</button>
     </div>
 
+    <!-- Main Content -->
     <div class="modal-container">
         <!-- Screen 1: Welcome -->
         <div class="screen" id="screen1">
             <div class="modal-content">
                 <div class="screen-background"></div>
                 <h1>Generate Your<br>Digital Business Card</h1>
+                
+                <!-- iOS Segmented Control -->
+                <div class="ios-segmented-control">
+                    <button class="segment-button selected">Personal</button>
+                    <button class="segment-button">Business</button>
+                </div>
+                
                 <div class="description">
                     Create a professional digital business card that you can share instantly. Your information will be converted into a QR code that anyone can scan.
                 </div>
                 
                 <!-- Settings Section -->
                 <div class="settings-section">
-                    <div class="setting-option">
+                    <div class="setting-option context-menu-trigger">
                         <div class="setting-icon dark-mode-icon"></div>
                         <div class="setting-text">
                             <h4>Dark Mode</h4>
@@ -74,10 +95,6 @@
                     <span class="button-icon continue-icon"></span>
                     Get Started
                 </button>
-                
-                <div class="footer-text">
-                    Your information will be used only to generate a digital business card. No data is stored or shared with third parties.
-                </div>
             </div>
         </div>
 
@@ -143,6 +160,22 @@
             <div class="dot"></div>
             <div class="dot"></div>
         </div>
+    </div>
+
+    <!-- iOS Bottom Sheet Modal -->
+    <div class="ios-sheet-modal">
+        <div class="sheet-handle"></div>
+        <div class="sheet-content">
+            <h3>Share Options</h3>
+            <div class="share-options">
+                <!-- Share options content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Pull to Refresh Indicator -->
+    <div class="pull-to-refresh">
+        <div class="refresh-spinner"></div>
     </div>
 
     <!-- Service Worker Registration -->

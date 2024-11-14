@@ -116,15 +116,15 @@ body {
 }
 
 #screen1 .screen-background {
-    background-image: url('/static/images/find-my-screen1.jpg');
+    background: linear-gradient(145deg, #000000 0%, #1a1a1a 100%);
 }
 
 #screen2 .screen-background {
-    background-image: url('/static/images/find-my-screen2.jpg');
+    background: linear-gradient(145deg, #000000 0%, #1a1a1a 80%, rgba(0, 122, 255, 0.15) 100%);
 }
 
 #screen3 .screen-background {
-    background-image: url('/static/images/find-my-screen3.jpg');
+    background: linear-gradient(145deg, #000000 0%, #1a1a1a 80%, rgba(128, 128, 128, 0.15) 100%);
 }
 
 .screen.active {

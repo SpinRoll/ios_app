@@ -7,6 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelButton = document.querySelector('.cancel-button');
     const toggleSwitch = document.querySelector('.ios-toggle input');
 
+    // Only proceed if required elements exist
+    if (!carousel || !screens.length || !dots.length) {
+        console.warn('Required carousel elements not found');
+        return;
+    }
+
     let currentScreen = 0;
     let startX = 0;
     let currentX = 0;
@@ -16,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     screens[0].classList.add('active');
 
     function updateCarousel(animate = true) {
+        if (!carousel) return;
+
         if (animate) {
             carousel.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
         } else {
@@ -43,31 +51,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Show/hide back button based on screen
         if (backButton) {
-            if (currentScreen > 0) {
-                backButton.style.display = 'flex';
-            } else {
-                backButton.style.display = 'none';
-            }
+            backButton.style.display = currentScreen > 0 ? 'flex' : 'none';
         }
     }
 
-    // Touch event handlers [...]
+    function handleTouchStart(e) {
+        if (!carousel) return;
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        currentX = startX;
+        carousel.style.transition = 'none';
+    }
 
-    buttons.forEach((button, index) => {
-        button.addEventListener('click', () => {
-            if (index < screens.length - 1) {
-                button.style.transform = 'scale(0.98)';
-                button.style.opacity = '0.9';
-                
-                setTimeout(() => {
-                    button.style.transform = '';
-                    button.style.opacity = '';
-                    currentScreen++;
-                    updateCarousel(true);
-                }, 150);
+    function handleTouchMove(e) {
+        if (!isDragging || !carousel) return;
+        
+        e.preventDefault();
+        currentX = e.touches[0].clientX;
+        const diff = currentX - startX;
+        const translateX = (-currentScreen * 100) + (diff / window.innerWidth * 100);
+        
+        // Add resistance at the edges
+        if (translateX > 0) {
+            carousel.style.transform = `translateX(${translateX * 0.3}%)`;
+        } else if (translateX < -((screens.length - 1) * 100)) {
+            const overscroll = translateX + ((screens.length - 1) * 100);
+            carousel.style.transform = `translateX(${-((screens.length - 1) * 100) + (overscroll * 0.3)}%)`;
+        } else {
+            carousel.style.transform = `translateX(${translateX}%)`;
+        }
+    }
+
+    function handleTouchEnd() {
+        if (!isDragging || !carousel) return;
+        
+        isDragging = false;
+        const diff = currentX - startX;
+        const threshold = window.innerWidth * 0.2;
+
+        if (Math.abs(diff) > threshold) {
+            if (diff > 0 && currentScreen > 0) {
+                currentScreen--;
+            } else if (diff < 0 && currentScreen < screens.length - 1) {
+                currentScreen++;
             }
+        }
+        
+        updateCarousel(true);
+    }
+
+    // Add event listeners only if elements exist
+    if (buttons.length) {
+        buttons.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                if (index < screens.length - 1) {
+                    button.style.transform = 'scale(0.98)';
+                    button.style.opacity = '0.9';
+                    
+                    setTimeout(() => {
+                        button.style.transform = '';
+                        button.style.opacity = '';
+                        currentScreen++;
+                        updateCarousel(true);
+                    }, 150);
+                }
+            });
         });
-    });
+    }
 
     // Back button functionality
     if (backButton) {
@@ -100,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Add touch events
+    // Add touch events only if carousel exists
     if (carousel) {
         carousel.addEventListener('touchstart', handleTouchStart);
         carousel.addEventListener('touchmove', handleTouchMove);
@@ -116,52 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle visibility change to reset animations
     document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
+        if (!document.hidden && screens[currentScreen]) {
             screens[currentScreen].classList.add('active');
         }
     });
-
-    function handleTouchStart(e) {
-        isDragging = true;
-        startX = e.touches[0].clientX;
-        currentX = startX;
-        carousel.style.transition = 'none';
-    }
-
-    function handleTouchMove(e) {
-        if (!isDragging) return;
-        
-        e.preventDefault();
-        currentX = e.touches[0].clientX;
-        const diff = currentX - startX;
-        const translateX = (-currentScreen * 100) + (diff / window.innerWidth * 100);
-        
-        // Add resistance at the edges
-        if (translateX > 0) {
-            carousel.style.transform = `translateX(${translateX * 0.3}%)`;
-        } else if (translateX < -((screens.length - 1) * 100)) {
-            const overscroll = translateX + ((screens.length - 1) * 100);
-            carousel.style.transform = `translateX(${-((screens.length - 1) * 100) + (overscroll * 0.3)}%)`;
-        } else {
-            carousel.style.transform = `translateX(${translateX}%)`;
-        }
-    }
-
-    function handleTouchEnd() {
-        if (!isDragging) return;
-        
-        isDragging = false;
-        const diff = currentX - startX;
-        const threshold = window.innerWidth * 0.2;
-
-        if (Math.abs(diff) > threshold) {
-            if (diff > 0 && currentScreen > 0) {
-                currentScreen--;
-            } else if (diff < 0 && currentScreen < screens.length - 1) {
-                currentScreen++;
-            }
-        }
-        
-        updateCarousel(true);
-    }
 });

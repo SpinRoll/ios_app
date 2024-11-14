@@ -1,19 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize elements object
     let elements = {
-        modalContainer: null,
-        screens: [],
-        dots: [],
-        buttons: [],
-        backButton: null,
-        cancelButton: null,
-        businessCardForm: null,
-        generateCardButton: null,
-        downloadQRButton: null,
-        qrCodeContainer: null,
-        loadingSpinner: null,
-        timeElement: null,
-        toggles: []
+        modalContainer: document.querySelector('.modal-container'),
+        screens: Array.from(document.querySelectorAll('.screen')),
+        dots: Array.from(document.querySelectorAll('.dot')),
+        buttons: Array.from(document.querySelectorAll('.ios-button')),
+        backButton: document.querySelector('.back-button'),
+        cancelButton: document.querySelector('.cancel-button'),
+        businessCardForm: document.getElementById('businessCardForm'),
+        generateCardButton: document.getElementById('generateCard'),
+        downloadQRButton: document.getElementById('downloadQR'),
+        qrCodeContainer: document.getElementById('qrCode'),
+        loadingSpinner: document.querySelector('.loading-spinner'),
+        toggles: Array.from(document.querySelectorAll('.ios-toggle input'))
     };
 
     // State management
@@ -25,8 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
         isAnimating: false,
         cardData: null,
         lastTap: 0,
-        darkMode: false,
-        hapticsEnabled: true
+        darkMode: localStorage.getItem('darkMode') === 'true',
+        hapticsEnabled: localStorage.getItem('hapticsEnabled') !== 'false'
     };
 
     // iOS-style haptic feedback (if available)
@@ -71,73 +70,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function initializeElements() {
+    // Initialize the application
+    function init() {
         try {
-            // Critical elements
-            const modalContainer = document.querySelector('.modal-container');
-            const screens = Array.from(document.querySelectorAll('.screen'));
-            
-            if (!modalContainer || screens.length === 0) {
+            if (!elements.modalContainer || elements.screens.length === 0) {
                 console.error('Critical elements missing');
-                return false;
+                return;
             }
 
-            // Initialize all elements
-            elements = {
-                modalContainer,
-                screens,
-                dots: Array.from(document.querySelectorAll('.dot')),
-                buttons: Array.from(document.querySelectorAll('.ios-button')),
-                backButton: document.querySelector('.back-button'),
-                cancelButton: document.querySelector('.cancel-button'),
-                businessCardForm: document.querySelector('#businessCardForm'),
-                generateCardButton: document.querySelector('#generateCard'),
-                downloadQRButton: document.querySelector('#downloadQR'),
-                qrCodeContainer: document.querySelector('#qrCode'),
-                loadingSpinner: document.querySelector('.loading-spinner'),
-                timeElement: document.querySelector('.time'),
-                toggles: Array.from(document.querySelectorAll('.ios-toggle input'))
-            };
-
-            // Set initial states
-            if (elements.screens[0]?.style) {
+            // Set initial screen state
+            if (elements.screens[0]) {
                 elements.screens[0].style.display = 'block';
                 elements.screens[0].classList.add('active');
             }
 
             // Initialize navigation buttons
-            if (elements.backButton?.style) {
+            if (elements.backButton) {
                 elements.backButton.style.display = 'none';
             }
-            if (elements.cancelButton?.style) {
+            if (elements.cancelButton) {
                 elements.cancelButton.style.display = 'none';
             }
 
-            // Initialize toggles
-            elements.toggles?.forEach(toggle => {
-                if (toggle?.parentElement) {
-                    const wrapper = toggle.parentElement;
-                    wrapper.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        hapticFeedback('light');
-                        toggle.checked = !toggle.checked;
-                        
-                        if (toggle.id === 'darkModeToggle') {
-                            state.darkMode = toggle.checked;
-                            document.body.classList.toggle('dark-mode', state.darkMode);
-                            localStorage.setItem('darkMode', state.darkMode);
-                        } else if (toggle.id === 'hapticsToggle') {
-                            state.hapticsEnabled = toggle.checked;
-                            localStorage.setItem('hapticsEnabled', state.hapticsEnabled);
-                        }
-                    });
-                }
-            });
+            // Setup event listeners
+            setupEventListeners();
+            setupFormInputs();
 
-            return true;
+            // Initialize dark mode
+            if (state.darkMode) {
+                const darkModeToggle = document.getElementById('darkModeToggle');
+                if (darkModeToggle) {
+                    darkModeToggle.checked = true;
+                    document.body.classList.add('dark-mode');
+                }
+            }
+
+            // Initialize haptics
+            const hapticsToggle = document.getElementById('hapticsToggle');
+            if (hapticsToggle) {
+                hapticsToggle.checked = state.hapticsEnabled;
+            }
+
         } catch (error) {
-            console.error('Error initializing elements:', error);
-            return false;
+            console.error('Initialization error:', error);
         }
     }
 
@@ -208,18 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Initialize the application
-    try {
-        if (initializeElements()) {
-            setupEventListeners();
-            setupFormInputs();
-            updateTime();
-            setInterval(updateTime, 60000);
-        }
-    } catch (error) {
-        console.error('Application initialization error:', error);
-    }
-
     function showFormError(input, message) {
         if (!input) return;
         
@@ -245,9 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateTime() {
-        if (elements.timeElement) {
+        const timeElement = document.querySelector('.time');
+        if (timeElement) {
             const now = new Date();
-            elements.timeElement.textContent = now.toLocaleTimeString('en-US', {
+            timeElement.textContent = now.toLocaleTimeString('en-US', {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false
@@ -505,44 +469,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Initialize when DOM is ready
-    function init() {
-        try {
-            // Initialize elements
-            if (!initializeElements()) {
-                console.error('Failed to initialize elements');
-                return;
-            }
-
-            // Setup event listeners and start the app
-            setupEventListeners();
-            setupFormInputs();
-            updateTime();
-            setInterval(updateTime, 60000);
-
-            // Initialize dark mode from localStorage
-            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-            if (savedDarkMode) {
-                const darkModeToggle = document.getElementById('darkModeToggle');
-                if (darkModeToggle) {
-                    darkModeToggle.checked = true;
-                    document.body.classList.add('dark-mode');
-                }
-            }
-
-            // Initialize haptics from localStorage
-            const savedHaptics = localStorage.getItem('hapticsEnabled') !== 'false';
-            const hapticsToggle = document.getElementById('hapticsToggle');
-            if (hapticsToggle) {
-                hapticsToggle.checked = savedHaptics;
-                state.hapticsEnabled = savedHaptics;
-            }
-
-        } catch (error) {
-            console.error('Initialization error:', error);
-        }
-    }
-
-    // Call init to start the application
+    // Start the application
     init();
 });

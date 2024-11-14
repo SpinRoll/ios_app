@@ -123,8 +123,12 @@ body {
 
 .modal-container {
     height: 100vh;
-    position: relative;
-    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
     padding-top: 88px;
 }
 
@@ -136,22 +140,25 @@ body {
     left: 0;
     display: none;
     opacity: 0;
+    z-index: 1;
     user-select: none;
     -webkit-user-select: none;
 }
 
 .screen.active {
     display: block;
-    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 1;
+    animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .screen.exit {
     display: block;
-    animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+    animation: fadeOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .modal-content {
-    background-color: rgba(28, 28, 30, 0.95);
+    background-color: rgba(28, 28, 30, 0.98);
     border-radius: var(--modal-border-radius) var(--modal-border-radius) 0 0;
     padding: var(--modal-padding);
     height: 100%;
@@ -160,7 +167,6 @@ body {
     align-items: center;
     text-align: center;
     position: relative;
-    overflow: hidden;
 }
 
 .screen-background {
@@ -969,3 +975,54 @@ h2 {
     background-color: rgba(255, 255, 255, 0.2);
     margin: 4px 0;
 }
+
+/* Modal Container Visibility */
+.modal-container {
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    padding-top: 88px;
+}
+
+.screen {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 88px);
+    top: 88px;
+    left: 0;
+    display: none;
+    opacity: 0;
+    z-index: 1;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.screen.active {
+    display: block;
+    opacity: 1;
+    animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.screen.exit {
+    display: block;
+    opacity: 0;
+    animation: fadeOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.modal-content {
+    background-color: rgba(28, 28, 30, 0.98);
+    border-radius: var(--modal-border-radius) var(--modal-border-radius) 0 0;
+    padding: var(--modal-padding);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+/* ... Rest of the CSS content ... */

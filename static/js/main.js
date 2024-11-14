@@ -384,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateScreen(direction = 'next') {
         if (state.isAnimating || !elements.screens) return;
-        
+    
         try {
             state.isAnimating = true;
 
@@ -393,50 +393,77 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.currentScreen + 1 : 
                 state.currentScreen - 1;
 
-            if (!currentScreen?.style || nextScreenIndex < 0 || nextScreenIndex >= elements.screens.length) {
+            if (!currentScreen || nextScreenIndex < 0 || nextScreenIndex >= elements.screens.length) {
                 state.isAnimating = false;
+                console.error('Invalid screen transition attempted');
                 return;
             }
 
             const nextScreen = elements.screens[nextScreenIndex];
-            if (!nextScreen?.style) {
+            if (!nextScreen) {
                 state.isAnimating = false;
+                console.error('Next screen element not found');
                 return;
             }
 
-            // Update screen display
-            nextScreen.style.display = 'block';
-            currentScreen.classList.remove('active');
-            currentScreen.classList.add('exit');
-            nextScreen.classList.add('active');
-
-            // Update dots
-            elements.dots?.forEach((dot, index) => {
-                if (!dot?.classList) return;
-                dot.classList.toggle('active', index === nextScreenIndex);
+            // Reset any existing transitions
+            elements.screens.forEach(screen => {
+                if (screen && screen !== currentScreen && screen !== nextScreen) {
+                    screen.style.display = 'none';
+                    screen.classList.remove('active', 'exit');
+                }
             });
 
-            // Update navigation
-            if (elements.backButton?.style) {
-                elements.backButton.style.display = nextScreenIndex > 0 ? 'flex' : 'none';
-            }
-            if (elements.cancelButton?.style) {
-                elements.cancelButton.style.display = nextScreenIndex > 0 ? 'flex' : 'none';
-            }
+            // Setup next screen
+            nextScreen.style.display = 'block';
+            nextScreen.style.opacity = '0';
 
-            // Reset after animation
-            setTimeout(() => {
-                if (currentScreen?.style) {
+            // Start transition
+            requestAnimationFrame(() => {
+                currentScreen.classList.remove('active');
+                currentScreen.classList.add('exit');
+                nextScreen.classList.add('active');
+            
+                // Update dots
+                elements.dots?.forEach((dot, index) => {
+                    if (!dot?.classList) return;
+                    dot.classList.toggle('active', index === nextScreenIndex);
+                });
+
+                // Update navigation
+                if (elements.backButton) {
+                    elements.backButton.style.display = nextScreenIndex > 0 ? 'flex' : 'none';
+                }
+                if (elements.cancelButton) {
+                    elements.cancelButton.style.display = nextScreenIndex > 0 ? 'flex' : 'none';
+                }
+
+                // Reset after animation
+                setTimeout(() => {
                     currentScreen.classList.remove('exit');
                     currentScreen.style.display = 'none';
-                }
-                state.currentScreen = nextScreenIndex;
-                state.isAnimating = false;
-            }, 500);
+                    state.currentScreen = nextScreenIndex;
+                    state.isAnimating = false;
+                }, 500);
+            });
 
         } catch (error) {
             console.error('Error updating screen:', error);
             state.isAnimating = false;
+            
+            // Attempt to recover from error
+            elements.screens.forEach(screen => {
+                if (screen) {
+                    screen.style.display = 'none';
+                    screen.classList.remove('active', 'exit');
+                }
+            });
+            
+            if (elements.screens[0]) {
+                elements.screens[0].style.display = 'block';
+                elements.screens[0].classList.add('active');
+                state.currentScreen = 0;
+            }
         }
     }
 

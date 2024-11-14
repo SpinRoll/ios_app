@@ -7,19 +7,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="ios-status-bar">
-        <div class="time">2:24</div>
-        <div class="status-icons">
-            <div class="signal"></div>
-            <div class="wifi"></div>
-            <div class="battery"></div>
-        </div>
+    <div class="header">
+        <div class="back-button"><span class="back-arrow"></span>Back</div>
+        <div class="cancel-button">Cancel</div>
     </div>
 
     <div class="carousel-container">
         <div class="carousel">
             <!-- Screen 1 -->
             <div class="screen" id="screen1">
+                <div class="screen-background"></div>
                 <h1>What's New in<br>Find My</h1>
                 <div class="description">
                     Get help finding a lost item by sharing its location with anyone or a locked contact. They will be able to see the location of your item for a time.
@@ -32,6 +29,7 @@
 
             <!-- Screen 2 -->
             <div class="screen" id="screen2">
+                <div class="screen-background"></div>
                 <div class="icon-container">
                     <img src="{{ url_for('static', filename='images/item-location.svg') }}" alt="Share Location Icon" class="screen-icon">
                 </div>
@@ -47,6 +45,7 @@
 
             <!-- Screen 3 -->
             <div class="screen" id="screen3">
+                <div class="screen-background"></div>
                 <div class="icon-container">
                     <img src="{{ url_for('static', filename='images/contact-info.svg') }}" alt="Contact Info Icon" class="screen-icon">
                 </div>
@@ -60,6 +59,10 @@
                         Allow others to get in touch
                         <div class="setting-subtext">Add your email address or phone number so that the finder of this item can get in touch</div>
                     </div>
+                    <label class="ios-toggle">
+                        <input type="checkbox" checked>
+                        <span class="ios-toggle-slider"></span>
+                    </label>
                 </div>
                 <button class="ios-button">Continue</button>
             </div>

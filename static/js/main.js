@@ -42,12 +42,84 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Show/hide back button based on screen
-        if (currentScreen > 0) {
-            backButton.style.display = 'flex';
-        } else {
-            backButton.style.display = 'none';
+        if (backButton) {
+            if (currentScreen > 0) {
+                backButton.style.display = 'flex';
+            } else {
+                backButton.style.display = 'none';
+            }
         }
     }
+
+    // Touch event handlers [...]
+
+    buttons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            if (index < screens.length - 1) {
+                button.style.transform = 'scale(0.98)';
+                button.style.opacity = '0.9';
+                
+                setTimeout(() => {
+                    button.style.transform = '';
+                    button.style.opacity = '';
+                    currentScreen++;
+                    updateCarousel(true);
+                }, 150);
+            }
+        });
+    });
+
+    // Back button functionality
+    if (backButton) {
+        backButton.addEventListener('click', () => {
+            if (currentScreen > 0) {
+                currentScreen--;
+                updateCarousel(true);
+            }
+        });
+    }
+
+    // Cancel button functionality
+    if (cancelButton) {
+        cancelButton.addEventListener('click', () => {
+            currentScreen = 0;
+            updateCarousel(true);
+        });
+    }
+
+    // Toggle switch functionality
+    if (toggleSwitch) {
+        toggleSwitch.addEventListener('change', () => {
+            const settingOption = toggleSwitch.closest('.setting-option');
+            if (settingOption) {
+                settingOption.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    settingOption.style.transform = '';
+                }, 150);
+            }
+        });
+    }
+
+    // Add touch events
+    if (carousel) {
+        carousel.addEventListener('touchstart', handleTouchStart);
+        carousel.addEventListener('touchmove', handleTouchMove);
+        carousel.addEventListener('touchend', handleTouchEnd);
+    }
+
+    // Prevent default touch behavior
+    document.body.addEventListener('touchmove', (e) => {
+        if (isDragging) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Handle visibility change to reset animations
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            screens[currentScreen].classList.add('active');
+        }
+    });
 
     function handleTouchStart(e) {
         isDragging = true;
@@ -92,67 +164,4 @@ document.addEventListener('DOMContentLoaded', () => {
         
         updateCarousel(true);
     }
-
-    buttons.forEach((button, index) => {
-        button.addEventListener('click', () => {
-            if (index < screens.length - 1) {
-                // Add button press animation
-                button.style.transform = 'scale(0.98)';
-                button.style.opacity = '0.9';
-                
-                setTimeout(() => {
-                    button.style.transform = '';
-                    button.style.opacity = '';
-                    currentScreen++;
-                    updateCarousel(true);
-                }, 150);
-            }
-        });
-    });
-
-    // Back button functionality
-    backButton.addEventListener('click', () => {
-        if (currentScreen > 0) {
-            currentScreen--;
-            updateCarousel(true);
-        }
-    });
-
-    // Cancel button functionality
-    cancelButton.addEventListener('click', () => {
-        currentScreen = 0;
-        updateCarousel(true);
-    });
-
-    // Toggle switch functionality
-    if (toggleSwitch) {
-        toggleSwitch.addEventListener('change', () => {
-            const settingOption = toggleSwitch.closest('.setting-option');
-            if (settingOption) {
-                settingOption.style.transform = 'scale(0.98)';
-                setTimeout(() => {
-                    settingOption.style.transform = '';
-                }, 150);
-            }
-        });
-    }
-
-    // Add touch events
-    carousel.addEventListener('touchstart', handleTouchStart);
-    carousel.addEventListener('touchmove', handleTouchMove);
-    carousel.addEventListener('touchend', handleTouchEnd);
-
-    // Prevent default touch behavior
-    document.body.addEventListener('touchmove', (e) => {
-        if (isDragging) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    // Handle visibility change to reset animations
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-            screens[currentScreen].classList.add('active');
-        }
-    });
 });

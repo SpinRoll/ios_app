@@ -4,10 +4,15 @@ const ASSETS_TO_CACHE = [
   '/static/css/style.css',
   '/static/js/main.js',
   '/static/manifest.json',
-  '/static/images/icon-192.png',
-  '/static/images/icon-512.png',
+  '/static/images/icon-192.svg',
+  '/static/images/icon-512.svg',
+  '/static/images/icon-192-maskable.svg',
+  '/static/images/icon-512-maskable.svg',
   '/static/images/contact-info.svg',
   '/static/images/item-location.svg',
+  '/static/images/splash-1290x2796.svg',
+  '/static/images/splash-1179x2556.svg',
+  '/static/images/splash-1284x2778.svg',
   'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js'
 ];
 

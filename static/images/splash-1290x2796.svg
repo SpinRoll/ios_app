@@ -1,0 +1,6 @@
+<svg width="1290" height="2796" viewBox="0 0 1290 2796" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1290" height="2796" fill="#000000"/>
+    <rect x="445" y="1248" width="400" height="400" rx="50" fill="#007AFF"/>
+    <path d="M645 1348C608.549 1348 579 1377.55 579 1414C579 1458.86 645 1504 645 1504C645 1504 711 1458.86 711 1414C711 1377.55 681.451 1348 645 1348ZM645 1438C629.536 1438 617 1425.46 617 1410C617 1394.54 629.536 1382 645 1382C660.464 1382 673 1394.54 673 1410C673 1425.46 660.464 1438 645 1438Z" fill="white"/>
+    <text x="645" y="1600" text-anchor="middle" font-family="SF Pro Display" font-size="48" fill="white">Digital Business Card</text>
+</svg>

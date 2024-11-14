@@ -12,23 +12,29 @@
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     
     <!-- iOS Icons -->
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-180.png') }}">
-    <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename='images/icon-152.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/icon-180.png') }}">
-    <link rel="apple-touch-icon" sizes="167x167" href="{{ url_for('static', filename='images/icon-167.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/icon-192.svg') }}">
+    <link rel="apple-touch-icon" sizes="192x192" href="{{ url_for('static', filename='images/icon-192.svg') }}">
+    <link rel="apple-touch-icon" sizes="512x512" href="{{ url_for('static', filename='images/icon-512.svg') }}">
     
     <!-- iOS Splash Screens -->
-    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='images/splash-2048x2732.png') }}" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='images/splash-1668x2388.png') }}" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='images/splash-1536x2048.png') }}" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)">
-    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='images/splash-1125x2436.png') }}" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
-    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='images/splash-1242x2688.png') }}" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" href="{{ url_for('static', filename='images/splash-1290x2796.svg') }}">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)" href="{{ url_for('static', filename='images/splash-1179x2556.svg') }}">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" href="{{ url_for('static', filename='images/splash-1284x2778.svg') }}">
     
     <title>Digital Business Card Generator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
+    <div class="ios-status-bar">
+        <div class="time">14:46</div>
+        <div class="status-icons">
+            <div class="signal"></div>
+            <div class="wifi"></div>
+            <div class="battery"></div>
+        </div>
+    </div>
+
     <div class="header">
         <button class="back-button"><span class="back-arrow"></span>Back</button>
         <button class="cancel-button">Cancel</button>
@@ -90,19 +96,19 @@
                 <form id="businessCardForm" class="ios-form">
                     <div class="form-group">
                         <div class="ios-input-wrapper">
-                            <input type="text" id="name" name="name" required class="ios-input">
+                            <input type="text" id="name" name="name" required class="ios-input" autocomplete="given-name">
                             <label for="name">First Name</label>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="ios-input-wrapper">
-                            <input type="text" id="surname" name="surname" required class="ios-input">
+                            <input type="text" id="surname" name="surname" required class="ios-input" autocomplete="family-name">
                             <label for="surname">Last Name</label>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="ios-input-wrapper">
-                            <input type="tel" id="phone" name="phone" required class="ios-input">
+                            <input type="tel" id="phone" name="phone" required class="ios-input" autocomplete="tel">
                             <label for="phone">Phone Number</label>
                         </div>
                     </div>

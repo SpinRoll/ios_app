@@ -1,167 +1,240 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize all DOM elements
-    const carousel = document.querySelector('.carousel');
-    const screens = Array.from(document.querySelectorAll('.screen'));
-    const dots = Array.from(document.querySelectorAll('.dot'));
-    const buttons = Array.from(document.querySelectorAll('.ios-button'));
-    const backButton = document.querySelector('.back-button');
-    const cancelButton = document.querySelector('.cancel-button');
-    const toggleSwitch = document.querySelector('.ios-toggle input');
+    // Initialize DOM elements with error handling
+    let elements = {
+        carousel: null,
+        screens: [],
+        dots: [],
+        buttons: [],
+        backButton: null,
+        cancelButton: null,
+        toggleSwitch: null
+    };
 
-    // Only proceed if required elements exist
-    if (!carousel || screens.length === 0 || dots.length === 0) {
-        console.warn('Required carousel elements not found');
+    try {
+        // Query all required elements
+        elements = {
+            carousel: document.querySelector('.carousel'),
+            screens: Array.from(document.querySelectorAll('.screen') || []),
+            dots: Array.from(document.querySelectorAll('.dot') || []),
+            buttons: Array.from(document.querySelectorAll('.ios-button') || []),
+            backButton: document.querySelector('.back-button'),
+            cancelButton: document.querySelector('.cancel-button'),
+            toggleSwitch: document.querySelector('.ios-toggle input')
+        };
+
+        // Validate required elements
+        if (!elements.carousel) {
+            throw new Error('Carousel element not found');
+        }
+        if (elements.screens.length === 0) {
+            throw new Error('No screen elements found');
+        }
+        if (elements.dots.length === 0) {
+            throw new Error('No dot elements found');
+        }
+    } catch (error) {
+        console.warn('Error initializing DOM elements:', error);
         return;
     }
 
-    let currentScreen = 0;
-    let startX = 0;
-    let currentX = 0;
-    let isDragging = false;
+    // State management
+    let state = {
+        currentScreen: 0,
+        startX: 0,
+        currentX: 0,
+        isDragging: false
+    };
 
-    // Set initial active screen and button states
-    screens[0]?.classList.add('active');
-    if (backButton) {
-        backButton.style.display = 'none';
+    // Set initial states
+    try {
+        elements.screens[0]?.classList.add('active');
+        if (elements.backButton) {
+            elements.backButton.style.display = 'none';
+        }
+    } catch (error) {
+        console.warn('Error setting initial states:', error);
     }
 
     function updateCarousel(animate = true) {
-        if (!carousel) return;
+        try {
+            if (!elements.carousel) return;
 
-        carousel.style.transition = animate ? 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
-        carousel.style.transform = `translateX(-${currentScreen * 100}%)`;
-        
-        // Update active states and animations
-        screens.forEach((screen, index) => {
-            if (screen) {
-                screen.classList.toggle('active', index === currentScreen);
+            // Update carousel transform
+            elements.carousel.style.transition = animate ? 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+            elements.carousel.style.transform = `translateX(-${state.currentScreen * 100}%)`;
+
+            // Update screen states
+            elements.screens.forEach((screen, index) => {
+                if (screen) {
+                    screen.classList.toggle('active', index === state.currentScreen);
+                }
+            });
+
+            // Update dot states
+            elements.dots.forEach((dot, index) => {
+                if (dot) {
+                    dot.classList.toggle('active', index === state.currentScreen);
+                }
+            });
+
+            // Update back button visibility
+            if (elements.backButton) {
+                elements.backButton.style.display = state.currentScreen > 0 ? 'flex' : 'none';
             }
-        });
-
-        dots.forEach((dot, index) => {
-            if (dot) {
-                dot.classList.toggle('active', index === currentScreen);
-            }
-        });
-
-        // Show/hide back button based on screen
-        if (backButton) {
-            backButton.style.display = currentScreen > 0 ? 'flex' : 'none';
+        } catch (error) {
+            console.warn('Error updating carousel:', error);
         }
     }
 
     function handleTouchStart(e) {
-        if (!e.touches || !carousel) return;
-        isDragging = true;
-        startX = e.touches[0].clientX;
-        currentX = startX;
-        carousel.style.transition = 'none';
+        try {
+            if (!e.touches || !elements.carousel) return;
+            state.isDragging = true;
+            state.startX = e.touches[0].clientX;
+            state.currentX = state.startX;
+            elements.carousel.style.transition = 'none';
+        } catch (error) {
+            console.warn('Error handling touch start:', error);
+        }
     }
 
     function handleTouchMove(e) {
-        if (!isDragging || !carousel || !e.touches) return;
-        
-        e.preventDefault();
-        currentX = e.touches[0].clientX;
-        const diff = currentX - startX;
-        const translateX = (-currentScreen * 100) + (diff / window.innerWidth * 100);
-        
-        // Add resistance at the edges
-        if (translateX > 0) {
-            carousel.style.transform = `translateX(${translateX * 0.3}%)`;
-        } else if (translateX < -((screens.length - 1) * 100)) {
-            const overscroll = translateX + ((screens.length - 1) * 100);
-            carousel.style.transform = `translateX(${-((screens.length - 1) * 100) + (overscroll * 0.3)}%)`;
-        } else {
-            carousel.style.transform = `translateX(${translateX}%)`;
+        try {
+            if (!state.isDragging || !elements.carousel || !e.touches) return;
+
+            e.preventDefault();
+            state.currentX = e.touches[0].clientX;
+            const diff = state.currentX - state.startX;
+            const translateX = (-state.currentScreen * 100) + (diff / window.innerWidth * 100);
+
+            // Add resistance at edges
+            if (translateX > 0) {
+                elements.carousel.style.transform = `translateX(${translateX * 0.3}%)`;
+            } else if (translateX < -((elements.screens.length - 1) * 100)) {
+                const overscroll = translateX + ((elements.screens.length - 1) * 100);
+                elements.carousel.style.transform = `translateX(${-((elements.screens.length - 1) * 100) + (overscroll * 0.3)}%)`;
+            } else {
+                elements.carousel.style.transform = `translateX(${translateX}%)`;
+            }
+        } catch (error) {
+            console.warn('Error handling touch move:', error);
         }
     }
 
     function handleTouchEnd() {
-        if (!isDragging || !carousel) return;
-        
-        isDragging = false;
-        const diff = currentX - startX;
-        const threshold = window.innerWidth * 0.2;
+        try {
+            if (!state.isDragging || !elements.carousel) return;
 
-        if (Math.abs(diff) > threshold) {
-            if (diff > 0 && currentScreen > 0) {
-                currentScreen--;
-            } else if (diff < 0 && currentScreen < screens.length - 1) {
-                currentScreen++;
+            state.isDragging = false;
+            const diff = state.currentX - state.startX;
+            const threshold = window.innerWidth * 0.2;
+
+            if (Math.abs(diff) > threshold) {
+                if (diff > 0 && state.currentScreen > 0) {
+                    state.currentScreen--;
+                } else if (diff < 0 && state.currentScreen < elements.screens.length - 1) {
+                    state.currentScreen++;
+                }
             }
-        }
-        
-        updateCarousel(true);
-    }
 
-    // Add touch event listeners to carousel
-    if (carousel) {
-        carousel.addEventListener('touchstart', handleTouchStart, { passive: false });
-        carousel.addEventListener('touchmove', handleTouchMove, { passive: false });
-        carousel.addEventListener('touchend', handleTouchEnd);
-    }
-
-    // Add click handlers to buttons
-    buttons.forEach((button, index) => {
-        if (button && index < screens.length - 1) {
-            button.addEventListener('click', () => {
-                button.style.transform = 'scale(0.98)';
-                button.style.opacity = '0.9';
-                
-                setTimeout(() => {
-                    button.style.transform = '';
-                    button.style.opacity = '';
-                    currentScreen++;
-                    updateCarousel(true);
-                }, 150);
-            });
-        }
-    });
-
-    // Add click handler to back button
-    if (backButton) {
-        backButton.addEventListener('click', () => {
-            if (currentScreen > 0) {
-                currentScreen--;
-                updateCarousel(true);
-            }
-        });
-    }
-
-    // Add click handler to cancel button
-    if (cancelButton) {
-        cancelButton.addEventListener('click', () => {
-            currentScreen = 0;
             updateCarousel(true);
-        });
+        } catch (error) {
+            console.warn('Error handling touch end:', error);
+        }
     }
 
-    // Add change handler to toggle switch
-    if (toggleSwitch) {
-        const settingOption = toggleSwitch.closest('.setting-option');
-        if (settingOption) {
-            toggleSwitch.addEventListener('change', () => {
-                settingOption.style.transform = 'scale(0.98)';
-                setTimeout(() => {
-                    settingOption.style.transform = '';
-                }, 150);
+    // Add event listeners with error handling
+    try {
+        // Touch events for carousel
+        if (elements.carousel) {
+            elements.carousel.addEventListener('touchstart', handleTouchStart, { passive: false });
+            elements.carousel.addEventListener('touchmove', handleTouchMove, { passive: false });
+            elements.carousel.addEventListener('touchend', handleTouchEnd);
+        }
+
+        // Continue buttons
+        elements.buttons.forEach((button, index) => {
+            if (button && index < elements.screens.length - 1) {
+                button.addEventListener('click', () => {
+                    try {
+                        button.style.transform = 'scale(0.98)';
+                        button.style.opacity = '0.9';
+
+                        setTimeout(() => {
+                            button.style.transform = '';
+                            button.style.opacity = '';
+                            state.currentScreen++;
+                            updateCarousel(true);
+                        }, 150);
+                    } catch (error) {
+                        console.warn('Error handling button click:', error);
+                    }
+                });
+            }
+        });
+
+        // Back button
+        if (elements.backButton) {
+            elements.backButton.addEventListener('click', () => {
+                try {
+                    if (state.currentScreen > 0) {
+                        state.currentScreen--;
+                        updateCarousel(true);
+                    }
+                } catch (error) {
+                    console.warn('Error handling back button:', error);
+                }
             });
         }
+
+        // Cancel button
+        if (elements.cancelButton) {
+            elements.cancelButton.addEventListener('click', () => {
+                try {
+                    state.currentScreen = 0;
+                    updateCarousel(true);
+                } catch (error) {
+                    console.warn('Error handling cancel button:', error);
+                }
+            });
+        }
+
+        // Toggle switch
+        if (elements.toggleSwitch) {
+            const settingOption = elements.toggleSwitch.closest('.setting-option');
+            if (settingOption) {
+                elements.toggleSwitch.addEventListener('change', () => {
+                    try {
+                        settingOption.style.transform = 'scale(0.98)';
+                        setTimeout(() => {
+                            settingOption.style.transform = '';
+                        }, 150);
+                    } catch (error) {
+                        console.warn('Error handling toggle switch:', error);
+                    }
+                });
+            }
+        }
+
+        // Prevent default touch behavior
+        document.body.addEventListener('touchmove', (e) => {
+            if (state.isDragging) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Handle visibility change
+        document.addEventListener('visibilitychange', () => {
+            try {
+                const currentScreenEl = elements.screens[state.currentScreen];
+                if (!document.hidden && currentScreenEl) {
+                    currentScreenEl.classList.add('active');
+                }
+            } catch (error) {
+                console.warn('Error handling visibility change:', error);
+            }
+        });
+    } catch (error) {
+        console.warn('Error setting up event listeners:', error);
     }
-
-    // Prevent default touch behavior on body
-    document.body.addEventListener('touchmove', (e) => {
-        if (isDragging) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    // Handle visibility change
-    document.addEventListener('visibilitychange', () => {
-        const currentScreenEl = screens[currentScreen];
-        if (!document.hidden && currentScreenEl) {
-            currentScreenEl.classList.add('active');
-        }
-    });
 });

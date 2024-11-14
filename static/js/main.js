@@ -78,18 +78,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the application
     function init() {
         try {
-            // Set initial screen state
-            if (elements.screens[0]) {
-                elements.screens[0].style.display = 'block';
-                elements.screens[0].classList.add('active');
-            }
+            // Set initial screen state with proper visibility
+            elements.screens.forEach((screen, index) => {
+                if (!screen) return;
+                
+                if (index === 0) {
+                    screen.style.visibility = 'visible';
+                    screen.classList.add('active');
+                    screen.style.opacity = '1';
+                } else {
+                    screen.style.visibility = 'hidden';
+                    screen.classList.remove('active');
+                    screen.style.opacity = '0';
+                }
+            });
 
             // Initialize navigation buttons
             if (elements.backButton) {
                 elements.backButton.style.display = 'none';
+                elements.backButton.style.visibility = 'visible';
             }
             if (elements.cancelButton) {
                 elements.cancelButton.style.display = 'none';
+                elements.cancelButton.style.visibility = 'visible';
             }
 
             // Setup event listeners
@@ -113,6 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Initialization error:', error);
+            // Recovery attempt
+            const firstScreen = elements.screens[0];
+            if (firstScreen) {
+                firstScreen.style.visibility = 'visible';
+                firstScreen.classList.add('active');
+                firstScreen.style.opacity = '1';
+            }
         }
     }
 
@@ -384,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateScreen(direction = 'next') {
         if (state.isAnimating || !elements.screens) return;
-    
+
         try {
             state.isAnimating = true;
 
@@ -409,21 +427,25 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset any existing transitions
             elements.screens.forEach(screen => {
                 if (screen && screen !== currentScreen && screen !== nextScreen) {
-                    screen.style.display = 'none';
+                    screen.style.visibility = 'hidden';
                     screen.classList.remove('active', 'exit');
                 }
             });
 
             // Setup next screen
-            nextScreen.style.display = 'block';
+            nextScreen.style.visibility = 'visible';
             nextScreen.style.opacity = '0';
 
             // Start transition
             requestAnimationFrame(() => {
                 currentScreen.classList.remove('active');
                 currentScreen.classList.add('exit');
+                
+                // Force a reflow to ensure the transition works
+                void nextScreen.offsetWidth;
+                
                 nextScreen.classList.add('active');
-            
+
                 // Update dots
                 elements.dots?.forEach((dot, index) => {
                     if (!dot?.classList) return;
@@ -441,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Reset after animation
                 setTimeout(() => {
                     currentScreen.classList.remove('exit');
-                    currentScreen.style.display = 'none';
+                    currentScreen.style.visibility = 'hidden';
                     state.currentScreen = nextScreenIndex;
                     state.isAnimating = false;
                 }, 500);
@@ -454,14 +476,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Attempt to recover from error
             elements.screens.forEach(screen => {
                 if (screen) {
-                    screen.style.display = 'none';
+                    screen.style.visibility = 'hidden';
                     screen.classList.remove('active', 'exit');
                 }
             });
-            
-            if (elements.screens[0]) {
-                elements.screens[0].style.display = 'block';
-                elements.screens[0].classList.add('active');
+
+            const firstScreen = elements.screens[0];
+            if (firstScreen) {
+                firstScreen.style.visibility = 'visible';
+                firstScreen.classList.add('active');
                 state.currentScreen = 0;
             }
         }

@@ -2,12 +2,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize DOM elements with error handling
     let elements = {
         modalContainer: null,
+        modal: null,
+        modalContent: null,
         screens: [],
         dots: [],
         buttons: [],
         backButton: null,
         cancelButton: null,
-        toggleSwitch: null
+        toggleSwitch: null,
+        closeButton: null
     };
 
     // State management
@@ -22,31 +25,28 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeElements() {
         try {
             // Query all required elements
-            const modalContainer = document.querySelector('.modal-container');
-            const screens = Array.from(document.querySelectorAll('.screen'));
-            const dots = Array.from(document.querySelectorAll('.dot'));
-            const buttons = Array.from(document.querySelectorAll('.ios-button'));
-            const backButton = document.querySelector('.back-button');
-            const cancelButton = document.querySelector('.cancel-button');
-            const toggleSwitch = document.querySelector('.ios-toggle input');
+            elements.modalContainer = document.querySelector('.modal-container');
+            elements.modal = document.querySelector('.modal');
+            elements.modalContent = document.querySelector('.modal-content');
+            elements.screens = Array.from(document.querySelectorAll('.screen'));
+            elements.dots = Array.from(document.querySelectorAll('.dot'));
+            elements.buttons = Array.from(document.querySelectorAll('.ios-button'));
+            elements.backButton = document.querySelector('.back-button');
+            elements.cancelButton = document.querySelector('.cancel-button');
+            elements.toggleSwitch = document.querySelector('.ios-toggle input');
+            elements.closeButton = document.querySelector('.close-button');
 
             // Validate required elements
-            if (!modalContainer) throw new Error('Modal container not found');
-            if (screens.length === 0) throw new Error('No screen elements found');
-            if (dots.length === 0) throw new Error('No dot elements found');
-
-            elements = {
-                modalContainer,
-                screens,
-                dots,
-                buttons,
-                backButton,
-                cancelButton,
-                toggleSwitch
-            };
+            if (!elements.modalContainer) throw new Error('Modal container not found');
+            if (elements.screens.length === 0) throw new Error('No screen elements found');
+            if (elements.dots.length === 0) throw new Error('No dot elements found');
 
             // Set initial states
-            elements.screens[0]?.classList.add('active');
+            const firstScreen = elements.screens[0];
+            if (firstScreen) {
+                firstScreen.classList.add('active');
+            }
+            
             if (elements.backButton) {
                 elements.backButton.style.display = 'none';
             }
@@ -99,13 +99,106 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Update state after animation
             setTimeout(() => {
-                currentScreen.classList.remove('exit');
+                if (currentScreen) {
+                    currentScreen.classList.remove('exit');
+                }
                 state.currentScreen = nextScreenIndex;
                 state.isAnimating = false;
             }, 500);
         } catch (error) {
             console.warn('Error updating screen:', error);
             state.isAnimating = false;
+        }
+    }
+
+    function setupEventListeners() {
+        try {
+            if (!elements.modalContainer) return;
+
+            // Touch events for modal container
+            elements.modalContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+            elements.modalContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+            elements.modalContainer.addEventListener('touchend', handleTouchEnd);
+
+            // Continue buttons
+            elements.buttons.forEach((button, index) => {
+                if (button && index < elements.screens.length - 1) {
+                    button.addEventListener('click', () => {
+                        if (button) {
+                            button.style.transform = 'scale(0.98)';
+                            button.style.opacity = '0.9';
+
+                            setTimeout(() => {
+                                if (button) {
+                                    button.style.transform = '';
+                                    button.style.opacity = '';
+                                    updateScreen('next');
+                                }
+                            }, 150);
+                        }
+                    });
+                }
+            });
+
+            // Back button
+            if (elements.backButton) {
+                elements.backButton.addEventListener('click', () => {
+                    if (state.currentScreen > 0) {
+                        updateScreen('prev');
+                    }
+                });
+            }
+
+            // Cancel button
+            if (elements.cancelButton) {
+                elements.cancelButton.addEventListener('click', () => {
+                    while (state.currentScreen > 0) {
+                        updateScreen('prev');
+                    }
+                });
+            }
+
+            // Close button
+            if (elements.closeButton) {
+                elements.closeButton.addEventListener('click', () => {
+                    if (elements.modal) {
+                        elements.modal.classList.remove('active');
+                        elements.modal.classList.add('exit');
+                        setTimeout(() => {
+                            if (elements.modal) {
+                                elements.modal.classList.remove('exit');
+                            }
+                        }, 500);
+                    }
+                });
+            }
+
+            // Toggle switch animation
+            if (elements.toggleSwitch) {
+                const settingOption = elements.toggleSwitch.closest('.setting-option');
+                if (settingOption) {
+                    elements.toggleSwitch.addEventListener('change', () => {
+                        settingOption.style.transform = 'scale(0.98)';
+                        setTimeout(() => {
+                            if (settingOption) {
+                                settingOption.style.transform = '';
+                            }
+                        }, 150);
+                    });
+                }
+            }
+
+            // Prevent default touch behavior
+            if (document.body) {
+                document.body.addEventListener('touchmove', (e) => {
+                    if (state.isDragging) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+            }
+
+        } catch (error) {
+            console.warn('Error setting up event listeners:', error);
         }
     }
 
@@ -135,75 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (diff < 0 && state.currentScreen < elements.screens.length - 1) {
                 updateScreen('next');
             }
-        }
-    }
-
-    function setupEventListeners() {
-        try {
-            // Only set up listeners if elements are properly initialized
-            if (!elements.modalContainer) return;
-
-            // Touch events for modal container
-            elements.modalContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
-            elements.modalContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
-            elements.modalContainer.addEventListener('touchend', handleTouchEnd);
-
-            // Continue buttons
-            elements.buttons.forEach((button, index) => {
-                if (button && index < elements.screens.length - 1) {
-                    button.addEventListener('click', () => {
-                        button.style.transform = 'scale(0.98)';
-                        button.style.opacity = '0.9';
-
-                        setTimeout(() => {
-                            button.style.transform = '';
-                            button.style.opacity = '';
-                            updateScreen('next');
-                        }, 150);
-                    });
-                }
-            });
-
-            // Back button
-            if (elements.backButton) {
-                elements.backButton.addEventListener('click', () => {
-                    if (state.currentScreen > 0) {
-                        updateScreen('prev');
-                    }
-                });
-            }
-
-            // Cancel button
-            if (elements.cancelButton) {
-                elements.cancelButton.addEventListener('click', () => {
-                    while (state.currentScreen > 0) {
-                        updateScreen('prev');
-                    }
-                });
-            }
-
-            // Toggle switch animation
-            if (elements.toggleSwitch) {
-                const settingOption = elements.toggleSwitch.closest('.setting-option');
-                if (settingOption) {
-                    elements.toggleSwitch.addEventListener('change', () => {
-                        settingOption.style.transform = 'scale(0.98)';
-                        setTimeout(() => {
-                            settingOption.style.transform = '';
-                        }, 150);
-                    });
-                }
-            }
-
-            // Prevent default touch behavior
-            document.body.addEventListener('touchmove', (e) => {
-                if (state.isDragging) {
-                    e.preventDefault();
-                }
-            }, { passive: false });
-
-        } catch (error) {
-            console.warn('Error setting up event listeners:', error);
         }
     }
 

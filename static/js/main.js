@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize elements object
-    let elements = {
+    // Initialize elements object with proper null checks
+    const elements = {
         modalContainer: document.querySelector('.modal-container'),
-        screens: Array.from(document.querySelectorAll('.screen')),
-        dots: Array.from(document.querySelectorAll('.dot')),
-        buttons: Array.from(document.querySelectorAll('.ios-button')),
+        screens: Array.from(document.querySelectorAll('.screen') || []),
+        dots: Array.from(document.querySelectorAll('.dot') || []),
+        buttons: Array.from(document.querySelectorAll('.ios-button') || []),
         backButton: document.querySelector('.back-button'),
         cancelButton: document.querySelector('.cancel-button'),
         businessCardForm: document.getElementById('businessCardForm'),
@@ -12,11 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadQRButton: document.getElementById('downloadQR'),
         qrCodeContainer: document.getElementById('qrCode'),
         loadingSpinner: document.querySelector('.loading-spinner'),
-        toggles: Array.from(document.querySelectorAll('.ios-toggle input'))
+        toggles: Array.from(document.querySelectorAll('.ios-toggle input') || [])
     };
 
-    // State management
-    let state = {
+    // Validate critical elements
+    if (!elements.modalContainer || elements.screens.length === 0) {
+        console.error('Critical elements missing');
+        return;
+    }
+
+    // State management with persistent storage
+    const state = {
         currentScreen: 0,
         startY: 0,
         currentY: 0,
@@ -28,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
         hapticsEnabled: localStorage.getItem('hapticsEnabled') !== 'false'
     };
 
-    // iOS-style haptic feedback (if available)
     function hapticFeedback(style = 'medium') {
         if ('vibrate' in navigator && state.hapticsEnabled) {
             switch(style) {
@@ -73,11 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the application
     function init() {
         try {
-            if (!elements.modalContainer || elements.screens.length === 0) {
-                console.error('Critical elements missing');
-                return;
-            }
-
             // Set initial screen state
             if (elements.screens[0]) {
                 elements.screens[0].style.display = 'block';
@@ -117,70 +117,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupEventListeners() {
-        try {
-            // Modal container touch events
-            elements.modalContainer?.addEventListener('touchstart', handleTouchStart, { passive: false });
-            elements.modalContainer?.addEventListener('touchmove', handleTouchMove, { passive: false });
-            elements.modalContainer?.addEventListener('touchend', handleTouchEnd);
+        // Modal container touch events with null checks
+        if (elements.modalContainer) {
+            elements.modalContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+            elements.modalContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+            elements.modalContainer.addEventListener('touchend', handleTouchEnd);
+        }
 
-            // Button event listeners
-            elements.buttons?.forEach(button => {
-                if (!button) return;
-                
-                button.addEventListener('touchstart', () => {
-                    hapticFeedback('light');
-                    button.classList?.add('touch-active');
-                });
-                
-                button.addEventListener('touchend', () => {
-                    button.classList?.remove('touch-active');
-                });
-
-                button.addEventListener('click', () => {
-                    hapticFeedback('medium');
-                    if (button.id === 'generateCard') {
-                        handleFormSubmit();
-                    } else if (button.id === 'downloadQR') {
-                        downloadQRCode();
-                    } else {
-                        updateScreen('next');
-                    }
-                });
+        // Button event listeners with null checks
+        elements.buttons.forEach(button => {
+            if (!button) return;
+            
+            button.addEventListener('touchstart', () => {
+                hapticFeedback('light');
+                button.classList.add('touch-active');
+            });
+            
+            button.addEventListener('touchend', () => {
+                button.classList.remove('touch-active');
             });
 
-            // Navigation buttons
-            elements.backButton?.addEventListener('click', () => {
+            button.addEventListener('click', () => {
+                hapticFeedback('medium');
+                if (button.id === 'generateCard') {
+                    handleFormSubmit();
+                } else if (button.id === 'downloadQR') {
+                    downloadQRCode();
+                } else {
+                    updateScreen('next');
+                }
+            });
+        });
+
+        // Navigation buttons with null checks
+        if (elements.backButton) {
+            elements.backButton.addEventListener('click', () => {
                 hapticFeedback('medium');
                 if (state.currentScreen > 0) {
                     updateScreen('prev');
                 }
             });
+        }
 
-            elements.cancelButton?.addEventListener('click', () => {
+        if (elements.cancelButton) {
+            elements.cancelButton.addEventListener('click', () => {
                 hapticFeedback('medium');
                 while (state.currentScreen > 0) {
                     updateScreen('prev');
                 }
             });
+        }
 
-            // Form submission
-            elements.businessCardForm?.addEventListener('submit', (e) => {
+        // Form submission with null check
+        if (elements.businessCardForm) {
+            elements.businessCardForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 handleFormSubmit();
             });
-
-            // Double tap prevention
-            document.addEventListener('touchend', (e) => {
-                const now = Date.now();
-                if (state.lastTap && (now - state.lastTap) < 300) {
-                    e.preventDefault();
-                }
-                state.lastTap = now;
-            });
-
-        } catch (error) {
-            console.error('Error setting up event listeners:', error);
         }
+
+        // Toggle switches with null checks
+        elements.toggles.forEach(toggle => {
+            if (!toggle || !toggle.parentElement) return;
+            
+            const wrapper = toggle.parentElement;
+            wrapper.addEventListener('click', (e) => {
+                e.preventDefault();
+                hapticFeedback('light');
+                toggle.checked = !toggle.checked;
+                
+                if (toggle.id === 'darkModeToggle') {
+                    state.darkMode = toggle.checked;
+                    document.body.classList.toggle('dark-mode', state.darkMode);
+                    localStorage.setItem('darkMode', state.darkMode);
+                } else if (toggle.id === 'hapticsToggle') {
+                    state.hapticsEnabled = toggle.checked;
+                    localStorage.setItem('hapticsEnabled', state.hapticsEnabled);
+                }
+            });
+        });
     }
 
     function showFormError(input, message) {

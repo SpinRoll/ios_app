@@ -1,0 +1,62 @@
+The site I was testing is: https://web-production-dd8fa.up.railway.app/
+Error: Error generating iOS package.
+Status code: 500
+Error: Internal Server Error
+Details: System.Net.Http.HttpRequestException: Response status code does not indicate success: 415 (Unsupported Media Type).
+   at System.Net.Http.HttpResponseMessage.EnsureSuccessStatusCode()
+   at Microsoft.PWABuilder.IOS.Web.Services.ImageGenerator.CreateIOSImagesZip(Byte[] image, Double padding, String backgroundColor) in D:\a\pwabuilder-ios\pwabuilder-ios\Microsoft.PWABuilder.IOS.Web\Services\ImageGenerator.cs:line 144
+   at Microsoft.PWABuilder.IOS.Web.Services.ImageGenerator.InvokePwabuilderImageGeneratorService(Validated options, WebAppManifestContext webManifest) in D:\a\pwabuilder-ios\pwabuilder-ios\Microsoft.PWABuilder.IOS.Web\Services\ImageGenerator.cs:line 67
+   at Microsoft.PWABuilder.IOS.Web.Services.ImageGenerator.Generate(Validated options, WebAppManifestContext manifest, String outputDirectory) in D:\a\pwabuilder-ios\pwabuilder-ios\Microsoft.PWABuilder.IOS.Web\Services\ImageGenerator.cs:line 60
+   at Microsoft.PWABuilder.IOS.Web.Services.IOSPackageCreator.Create(Validated options) in D:\a\pwabuilder-ios\pwabuilder-ios\Microsoft.PWABuilder.IOS.Web\Services\IOSPackageCreator.cs:line 69
+   at Microsoft.PWABuilder.IOS.Web.Controllers.PackagesController.Create(IOSAppPackageOptions options) in D:\a\pwabuilder-ios\pwabuilder-ios\Microsoft.PWABuilder.IOS.Web\Controllers\PackagesController.cs:line 55
+   at lambda_method4(Closure, Object)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+
+HEADERS
+=======
+Accept: */*
+Accept-Encoding: gzip, deflate, br, zstd
+Accept-Language: it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7
+Content-Length: 1061
+Content-Type: application/json
+Host: pwabuilder-ios.azurewebsites.net
+Max-Forwards: 10
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 OPR/114.0.0.0
+Origin: https://www.pwabuilder.com
+sec-ch-ua: "Chromium";v="128", "Not;A=Brand";v="24", "Opera";v="114"
+correlation-id: dd2ed9a7-1f94-4e13-a10e1-f910691bc1e6c
+platform-identifier-version: 1.0.0
+sec-ch-ua-mobile: ?0
+platform-identifier: PWABuilder
+sec-ch-ua-platform: "Windows"
+Sec-Fetch-Site: cross-site
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+X-ARR-LOG-ID: 5a518e47-b10f-4f45-8320-bf15806a18d2
+CLIENT-IP: 37.186.247.116:56500
+DISGUISED-HOST: pwabuilder-ios.azurewebsites.net
+X-SITE-DEPLOYMENT-ID: pwabuilder-ios__82a9
+WAS-DEFAULT-HOSTNAME: pwabuilder-ios.azurewebsites.net
+X-Forwarded-Proto: https
+X-AppService-Proto: https
+X-ARR-SSL: 2048|256|CN=Microsoft Azure RSA TLS Issuing CA 08, O=Microsoft Corporation, C=US|CN=*.azurewebsites.net, O=Microsoft Corporation, L=Redmond, S=WA, C=US
+X-Forwarded-TlsVersion: 1.3
+X-Forwarded-For: 37.186.247.116:56500
+X-Original-URL: /packages/create
+X-WAWS-Unencoded-URL: /packages/create
+
+    at Le (https://www.pwabuilder.com/code/test-publish-pane.c459aeca.js:6:279)
+    at async Ke (https://www.pwabuilder.com/code/test-publish-pane.c459aeca.js:14:7232)
+    at async ye (https://www.pwabuilder.com/code/test-publish-pane.c459aeca.js:14:7071)
+    at async g.generate (https://www.pwabuilder.com/code/test-publish-pane.c459aeca.js:1832:1123)

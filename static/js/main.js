@@ -78,29 +78,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the application
     function init() {
         try {
-            // Set initial screen state with proper visibility
-            elements.screens.forEach((screen, index) => {
-                if (!screen) return;
-                
-                if (index === 0) {
-                    screen.style.visibility = 'visible';
-                    screen.classList.add('active');
-                    screen.style.opacity = '1';
-                } else {
-                    screen.style.visibility = 'hidden';
-                    screen.classList.remove('active');
-                    screen.style.opacity = '0';
-                }
-            });
+            // Set initial screen state
+            if (elements.screens[0]) {
+                elements.screens[0].style.display = 'block';
+                elements.screens[0].classList.add('active');
+            }
 
             // Initialize navigation buttons
             if (elements.backButton) {
                 elements.backButton.style.display = 'none';
-                elements.backButton.style.visibility = 'visible';
             }
             if (elements.cancelButton) {
                 elements.cancelButton.style.display = 'none';
-                elements.cancelButton.style.visibility = 'visible';
             }
 
             // Setup event listeners
@@ -124,13 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Initialization error:', error);
-            // Recovery attempt
-            const firstScreen = elements.screens[0];
-            if (firstScreen) {
-                firstScreen.style.visibility = 'visible';
-                firstScreen.classList.add('active');
-                firstScreen.style.opacity = '1';
-            }
         }
     }
 
@@ -402,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateScreen(direction = 'next') {
         if (state.isAnimating || !elements.screens) return;
-
+        
         try {
             state.isAnimating = true;
 
@@ -411,82 +393,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.currentScreen + 1 : 
                 state.currentScreen - 1;
 
-            if (!currentScreen || nextScreenIndex < 0 || nextScreenIndex >= elements.screens.length) {
+            if (!currentScreen?.style || nextScreenIndex < 0 || nextScreenIndex >= elements.screens.length) {
                 state.isAnimating = false;
-                console.error('Invalid screen transition attempted');
                 return;
             }
 
             const nextScreen = elements.screens[nextScreenIndex];
-            if (!nextScreen) {
+            if (!nextScreen?.style) {
                 state.isAnimating = false;
-                console.error('Next screen element not found');
                 return;
             }
 
-            // Reset any existing transitions
-            elements.screens.forEach(screen => {
-                if (screen && screen !== currentScreen && screen !== nextScreen) {
-                    screen.style.visibility = 'hidden';
-                    screen.classList.remove('active', 'exit');
-                }
+            // Update screen display
+            nextScreen.style.display = 'block';
+            currentScreen.classList.remove('active');
+            currentScreen.classList.add('exit');
+            nextScreen.classList.add('active');
+
+            // Update dots
+            elements.dots?.forEach((dot, index) => {
+                if (!dot?.classList) return;
+                dot.classList.toggle('active', index === nextScreenIndex);
             });
 
-            // Setup next screen
-            nextScreen.style.visibility = 'visible';
-            nextScreen.style.opacity = '0';
+            // Update navigation
+            if (elements.backButton?.style) {
+                elements.backButton.style.display = nextScreenIndex > 0 ? 'flex' : 'none';
+            }
+            if (elements.cancelButton?.style) {
+                elements.cancelButton.style.display = nextScreenIndex > 0 ? 'flex' : 'none';
+            }
 
-            // Start transition
-            requestAnimationFrame(() => {
-                currentScreen.classList.remove('active');
-                currentScreen.classList.add('exit');
-                
-                // Force a reflow to ensure the transition works
-                void nextScreen.offsetWidth;
-                
-                nextScreen.classList.add('active');
-
-                // Update dots
-                elements.dots?.forEach((dot, index) => {
-                    if (!dot?.classList) return;
-                    dot.classList.toggle('active', index === nextScreenIndex);
-                });
-
-                // Update navigation
-                if (elements.backButton) {
-                    elements.backButton.style.display = nextScreenIndex > 0 ? 'flex' : 'none';
-                }
-                if (elements.cancelButton) {
-                    elements.cancelButton.style.display = nextScreenIndex > 0 ? 'flex' : 'none';
-                }
-
-                // Reset after animation
-                setTimeout(() => {
+            // Reset after animation
+            setTimeout(() => {
+                if (currentScreen?.style) {
                     currentScreen.classList.remove('exit');
-                    currentScreen.style.visibility = 'hidden';
-                    state.currentScreen = nextScreenIndex;
-                    state.isAnimating = false;
-                }, 500);
-            });
+                    currentScreen.style.display = 'none';
+                }
+                state.currentScreen = nextScreenIndex;
+                state.isAnimating = false;
+            }, 500);
 
         } catch (error) {
             console.error('Error updating screen:', error);
             state.isAnimating = false;
-            
-            // Attempt to recover from error
-            elements.screens.forEach(screen => {
-                if (screen) {
-                    screen.style.visibility = 'hidden';
-                    screen.classList.remove('active', 'exit');
-                }
-            });
-
-            const firstScreen = elements.screens[0];
-            if (firstScreen) {
-                firstScreen.style.visibility = 'visible';
-                firstScreen.classList.add('active');
-                state.currentScreen = 0;
-            }
         }
     }
 
@@ -534,187 +484,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Add new UI component handlers
-    function initializeIOSComponents() {
-        // Bottom Sheet Modal
-        const sheet = document.querySelector('.ios-sheet-modal');
-        let startY = 0;
-        let currentY = 0;
-        let initialSheetHeight = 0;
-
-        function handleSheetTouchStart(e) {
-            startY = e.touches[0].clientY;
-            initialSheetHeight = sheet.getBoundingClientRect().height;
-            sheet.style.transition = 'none';
-        }
-
-        function handleSheetTouchMove(e) {
-            currentY = e.touches[0].clientY;
-            const diff = currentY - startY;
-            
-            if (diff > 0) {
-                sheet.style.transform = `translateY(${diff}px)`;
-            }
-        }
-
-        function handleSheetTouchEnd() {
-            sheet.style.transition = 'transform 0.3s ease';
-            if (currentY - startY > initialSheetHeight * 0.3) {
-                closeSheet();
-            } else {
-                sheet.style.transform = 'translateY(0)';
-            }
-        }
-
-        if (sheet) {
-            sheet.addEventListener('touchstart', handleSheetTouchStart);
-            sheet.addEventListener('touchmove', handleSheetTouchMove);
-            sheet.addEventListener('touchend', handleSheetTouchEnd);
-        }
-
-        // Action Sheet
-        const actionSheet = document.querySelector('.ios-action-sheet');
-        if (actionSheet) {
-            actionSheet.addEventListener('click', (e) => {
-                if (e.target === actionSheet) {
-                    closeActionSheet();
-                }
-            });
-        }
-
-        // Segmented Control
-        const segmentedControls = document.querySelectorAll('.ios-segmented-control');
-        segmentedControls.forEach(control => {
-            control.addEventListener('click', (e) => {
-                if (e.target.classList.contains('segment-button')) {
-                    const buttons = control.querySelectorAll('.segment-button');
-                    buttons.forEach(button => button.classList.remove('selected'));
-                    e.target.classList.add('selected');
-                    hapticFeedback('light');
-                }
-            });
-        });
-
-        // Context Menu
-        let activeContextMenu = null;
-        document.addEventListener('contextmenu', (e) => {
-            if (e.target.classList.contains('context-menu-trigger')) {
-                e.preventDefault();
-                showContextMenu(e);
-            }
-        });
-
-        document.addEventListener('click', (e) => {
-            if (activeContextMenu && !e.target.closest('.ios-context-menu')) {
-                closeContextMenu();
-            }
-        });
-    }
-
-    function showSheet() {
-        const sheet = document.querySelector('.ios-sheet-modal');
-        if (sheet) {
-            sheet.classList.add('show');
-            hapticFeedback('medium');
-        }
-    }
-
-    function closeSheet() {
-        const sheet = document.querySelector('.ios-sheet-modal');
-        if (sheet) {
-            sheet.classList.remove('show');
-            hapticFeedback('light');
-        }
-    }
-
-    function showActionSheet(options) {
-        const existingSheet = document.querySelector('.ios-action-sheet');
-        if (existingSheet) {
-            existingSheet.remove();
-        }
-
-        const sheet = document.createElement('div');
-        sheet.className = 'ios-action-sheet';
-        
-        options.forEach(option => {
-            const button = document.createElement('button');
-            button.className = 'action-sheet-button';
-            if (option.destructive) {
-                button.classList.add('destructive');
-            }
-            button.textContent = option.text;
-            button.onclick = () => {
-                option.action();
-                closeActionSheet();
-            };
-            sheet.appendChild(button);
-        });
-
-        const cancelButton = document.createElement('button');
-        cancelButton.className = 'action-sheet-button action-sheet-cancel';
-        cancelButton.textContent = 'Cancel';
-        cancelButton.onclick = closeActionSheet;
-        sheet.appendChild(cancelButton);
-
-        document.body.appendChild(sheet);
-        requestAnimationFrame(() => {
-            sheet.classList.add('show');
-            hapticFeedback('medium');
-        });
-    }
-
-    function closeActionSheet() {
-        const sheet = document.querySelector('.ios-action-sheet');
-        if (sheet) {
-            sheet.classList.remove('show');
-            hapticFeedback('light');
-            setTimeout(() => sheet.remove(), 300);
-        }
-    }
-
-    function showContextMenu(event) {
-        closeContextMenu();
-        
-        const menu = document.createElement('div');
-        menu.className = 'ios-context-menu';
-        menu.style.left = `${event.clientX}px`;
-        menu.style.top = `${event.clientY}px`;
-        
-        // Adjust position if menu would go off screen
-        requestAnimationFrame(() => {
-            const rect = menu.getBoundingClientRect();
-            if (rect.right > window.innerWidth) {
-                menu.style.left = `${window.innerWidth - rect.width - 10}px`;
-            }
-            if (rect.bottom > window.innerHeight) {
-                menu.style.top = `${window.innerHeight - rect.height - 10}px`;
-            }
-        });
-
-        document.body.appendChild(menu);
-        activeContextMenu = menu;
-        requestAnimationFrame(() => menu.classList.add('show'));
-        hapticFeedback('light');
-    }
-
-    function closeContextMenu() {
-        if (activeContextMenu) {
-            activeContextMenu.classList.remove('show');
-            setTimeout(() => {
-                activeContextMenu.remove();
-                activeContextMenu = null;
-            }, 200);
-            hapticFeedback('light');
-        }
-    }
-
-    // Initialize components when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
-        init();
-        initializeIOSComponents();
-        
-        // Update time every minute
-        updateTime();
-        setInterval(updateTime, 60000);
-    });
+    // Start the application
+    init();
 });

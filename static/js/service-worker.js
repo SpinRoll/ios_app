@@ -40,18 +40,8 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch event - serve from cache, fallback to network with HTTPS enforcement
+// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', event => {
-  // Ensure request is HTTPS or localhost
-  const url = new URL(event.request.url);
-  const isHttps = url.protocol === 'https:' || url.hostname === 'localhost' || url.hostname.includes('repl.co');
-  
-  if (!isHttps) {
-    const httpsUrl = 'https://' + url.host + url.pathname + url.search;
-    event.respondWith(fetch(httpsUrl, event.request));
-    return;
-  }
-
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -60,10 +50,6 @@ self.addEventListener('fetch', event => {
         }
         return fetch(event.request)
           .then(response => {
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
             // Don't cache non-GET requests
             if (event.request.method !== 'GET') {
               return response;

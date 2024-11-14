@@ -12,8 +12,6 @@
     --ios-error: #FF3B30;
     --safe-area-inset-top: env(safe-area-inset-top);
     --safe-area-inset-bottom: env(safe-area-inset-bottom);
-    --ios-nav-height: 44px;
-    --ios-sheet-background: rgba(30, 30, 30, 0.95);
 }
 
 * {
@@ -123,12 +121,8 @@ body {
 
 .modal-container {
     height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 100;
+    position: relative;
+    overflow: hidden;
     padding-top: 88px;
 }
 
@@ -140,25 +134,22 @@ body {
     left: 0;
     display: none;
     opacity: 0;
-    z-index: 1;
     user-select: none;
     -webkit-user-select: none;
 }
 
 .screen.active {
     display: block;
-    opacity: 1;
-    animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .screen.exit {
     display: block;
-    opacity: 0;
-    animation: fadeOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .modal-content {
-    background-color: rgba(28, 28, 30, 0.98);
+    background-color: rgba(28, 28, 30, 0.95);
     border-radius: var(--modal-border-radius) var(--modal-border-radius) 0 0;
     padding: var(--modal-padding);
     height: 100%;
@@ -167,6 +158,7 @@ body {
     align-items: center;
     text-align: center;
     position: relative;
+    overflow: hidden;
 }
 
 .screen-background {
@@ -758,271 +750,3 @@ h2 {
     user-select: none;
     -webkit-user-select: none;
 }
-
-/* Navigation Bar Improvements */
-.ios-nav-bar {
-    position: fixed;
-    top: var(--safe-area-inset-top);
-    left: 0;
-    right: 0;
-    height: var(--ios-nav-height);
-    background-color: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
-    transition: all 0.3s ease;
-}
-
-.nav-title {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--ios-text);
-    text-align: center;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-/* Bottom Sheet Modal */
-.ios-sheet-modal {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: var(--ios-sheet-background);
-    border-radius: 12px 12px 0 0;
-    transform: translateY(100%);
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 2000;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.ios-sheet-modal.show {
-    transform: translateY(0);
-}
-
-.sheet-handle {
-    width: 36px;
-    height: 5px;
-    background-color: var(--ios-secondary-text);
-    border-radius: 2.5px;
-    margin: 8px auto;
-}
-
-.sheet-content {
-    padding: 20px 16px;
-    padding-bottom: calc(20px + var(--safe-area-inset-bottom));
-}
-
-/* Action Sheet */
-.ios-action-sheet {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: transparent;
-    z-index: 2000;
-    padding: 8px;
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
-}
-
-.ios-action-sheet.show {
-    transform: translateY(0);
-}
-
-.action-sheet-button {
-    width: 100%;
-    height: 57px;
-    background-color: var(--ios-sheet-background);
-    border: none;
-    border-radius: 12px;
-    color: var(--ios-blue);
-    font-size: 20px;
-    margin-bottom: 8px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-.action-sheet-button.destructive {
-    color: var(--ios-error);
-}
-
-.action-sheet-cancel {
-    color: var(--ios-blue);
-    font-weight: 600;
-}
-
-/* Pull to Refresh */
-.pull-to-refresh {
-    position: absolute;
-    top: -60px;
-    left: 0;
-    right: 0;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s ease;
-}
-
-.refresh-spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: var(--ios-text);
-    border-radius: 50%;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.pull-to-refresh.pulling .refresh-spinner {
-    opacity: 1;
-}
-
-.pull-to-refresh.refreshing .refresh-spinner {
-    opacity: 1;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* iOS-style Segmented Control */
-.ios-segmented-control {
-    background-color: rgba(118, 118, 128, 0.24);
-    border-radius: 8px;
-    padding: 2px;
-    display: flex;
-    margin: 16px;
-}
-
-.segment-button {
-    flex: 1;
-    height: 32px;
-    border: none;
-    background: none;
-    color: var(--ios-text);
-    font-size: 15px;
-    font-weight: 500;
-    position: relative;
-    transition: color 0.3s ease;
-}
-
-.segment-button.selected {
-    color: var(--ios-background);
-}
-
-.segment-button.selected::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--ios-text);
-    border-radius: 6.5px;
-    z-index: -1;
-    transition: all 0.3s ease;
-}
-
-/* Context Menu */
-.ios-context-menu {
-    position: fixed;
-    background-color: var(--ios-sheet-background);
-    border-radius: 12px;
-    min-width: 250px;
-    max-width: 90vw;
-    overflow: hidden;
-    z-index: 2100;
-    transform: scale(0.95);
-    opacity: 0;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-}
-
-.ios-context-menu.show {
-    transform: scale(1);
-    opacity: 1;
-}
-
-.context-menu-item {
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--ios-text);
-    font-size: 17px;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-}
-
-.context-menu-item:active {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.context-menu-separator {
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.2);
-    margin: 4px 0;
-}
-
-/* Modal Container Visibility */
-.modal-container {
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 100;
-    padding-top: 88px;
-}
-
-.screen {
-    position: absolute;
-    width: 100%;
-    height: calc(100% - 88px);
-    top: 88px;
-    left: 0;
-    display: none;
-    opacity: 0;
-    z-index: 1;
-    user-select: none;
-    -webkit-user-select: none;
-}
-
-.screen.active {
-    display: block;
-    opacity: 1;
-    animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-.screen.exit {
-    display: block;
-    opacity: 0;
-    animation: fadeOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-.modal-content {
-    background-color: rgba(28, 28, 30, 0.98);
-    border-radius: var(--modal-border-radius) var(--modal-border-radius) 0 0;
-    padding: var(--modal-padding);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    position: relative;
-}
-
-/* ... Rest of the CSS content ... */

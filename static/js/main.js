@@ -25,12 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
         isAnimating: false,
         cardData: null,
         lastTap: 0,
-        darkMode: false
+        darkMode: false,
+        hapticsEnabled: true
     };
 
     // iOS-style haptic feedback (if available)
     function hapticFeedback(style = 'medium') {
-        if ('vibrate' in navigator) {
+        if ('vibrate' in navigator && state.hapticsEnabled) {
             switch(style) {
                 case 'light':
                     navigator.vibrate(10);
@@ -124,6 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (toggle.id === 'darkModeToggle') {
                             state.darkMode = toggle.checked;
                             document.body.classList.toggle('dark-mode', state.darkMode);
+                            localStorage.setItem('darkMode', state.darkMode);
+                        } else if (toggle.id === 'hapticsToggle') {
+                            state.hapticsEnabled = toggle.checked;
+                            localStorage.setItem('hapticsEnabled', state.hapticsEnabled);
                         }
                     });
                 }
@@ -499,4 +504,45 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+
+    // Initialize when DOM is ready
+    function init() {
+        try {
+            // Initialize elements
+            if (!initializeElements()) {
+                console.error('Failed to initialize elements');
+                return;
+            }
+
+            // Setup event listeners and start the app
+            setupEventListeners();
+            setupFormInputs();
+            updateTime();
+            setInterval(updateTime, 60000);
+
+            // Initialize dark mode from localStorage
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (savedDarkMode) {
+                const darkModeToggle = document.getElementById('darkModeToggle');
+                if (darkModeToggle) {
+                    darkModeToggle.checked = true;
+                    document.body.classList.add('dark-mode');
+                }
+            }
+
+            // Initialize haptics from localStorage
+            const savedHaptics = localStorage.getItem('hapticsEnabled') !== 'false';
+            const hapticsToggle = document.getElementById('hapticsToggle');
+            if (hapticsToggle) {
+                hapticsToggle.checked = savedHaptics;
+                state.hapticsEnabled = savedHaptics;
+            }
+
+        } catch (error) {
+            console.error('Initialization error:', error);
+        }
+    }
+
+    // Call init to start the application
+    init();
 });

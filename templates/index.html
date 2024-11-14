@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Find My</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="ios-status-bar">
+        <div class="time">2:24</div>
+        <div class="status-icons">
+            <div class="signal"></div>
+            <div class="wifi"></div>
+            <div class="battery"></div>
+        </div>
+    </div>
+
+    <div class="carousel-container">
+        <div class="carousel">
+            <!-- Screen 1 -->
+            <div class="screen" id="screen1">
+                <h1>What's New in<br>Find My</h1>
+                <div class="description">
+                    Get help finding a lost item by sharing its location with anyone or a locked contact. They will be able to see the location of your item for a time.
+                </div>
+                <button class="ios-button">Continue</button>
+                <div class="footer-text">
+                    Information about you and the people you're sharing location with will only be used to help you share location and improve Find My. Your location will only be shared when you use Find My sharing features.
+                </div>
+            </div>
+
+            <!-- Screen 2 -->
+            <div class="screen" id="screen2">
+                <div class="icon-container">
+                    <img src="{{ url_for('static', filename='images/item-location.svg') }}" alt="Share Location Icon" class="screen-icon">
+                </div>
+                <h2>Share Item Location</h2>
+                <div class="description">
+                    Get help finding your lost item by sharing its location with anyone or a locked contact.
+                </div>
+                <div class="sub-description">
+                    The person who opens the link will be able to see the location of your item for a limited time.
+                </div>
+                <button class="ios-button">Continue</button>
+            </div>
+
+            <!-- Screen 3 -->
+            <div class="screen" id="screen3">
+                <div class="icon-container">
+                    <img src="{{ url_for('static', filename='images/contact-info.svg') }}" alt="Contact Info Icon" class="screen-icon">
+                </div>
+                <h2>Show Contact Info</h2>
+                <div class="description">
+                    Connect to reveal information
+                </div>
+                <div class="setting-option">
+                    <div class="setting-icon"></div>
+                    <div class="setting-text">
+                        Allow others to get in touch
+                        <div class="setting-subtext">Add your email address or phone number so that the finder of this item can get in touch</div>
+                    </div>
+                </div>
+                <button class="ios-button">Continue</button>
+            </div>
+        </div>
+        
+        <div class="pagination">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

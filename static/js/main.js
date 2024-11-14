@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const screens = document.querySelectorAll('.screen');
     const dots = document.querySelectorAll('.dot');
     const buttons = document.querySelectorAll('.ios-button');
+    const backButton = document.querySelector('.back-button');
+    const cancelButton = document.querySelector('.cancel-button');
+    const toggleSwitch = document.querySelector('.ios-toggle input');
 
     let currentScreen = 0;
     let startX = 0;
@@ -37,6 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 dot.classList.remove('active');
             }
         });
+
+        // Show/hide back button based on screen
+        if (currentScreen > 0) {
+            backButton.style.display = 'flex';
+        } else {
+            backButton.style.display = 'none';
+        }
     }
 
     function handleTouchStart(e) {
@@ -99,6 +109,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Back button functionality
+    backButton.addEventListener('click', () => {
+        if (currentScreen > 0) {
+            currentScreen--;
+            updateCarousel(true);
+        }
+    });
+
+    // Cancel button functionality
+    cancelButton.addEventListener('click', () => {
+        currentScreen = 0;
+        updateCarousel(true);
+    });
+
+    // Toggle switch functionality
+    if (toggleSwitch) {
+        toggleSwitch.addEventListener('change', () => {
+            const settingOption = toggleSwitch.closest('.setting-option');
+            if (settingOption) {
+                settingOption.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    settingOption.style.transform = '';
+                }, 150);
+            }
+        });
+    }
 
     // Add touch events
     carousel.addEventListener('touchstart', handleTouchStart);

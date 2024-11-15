@@ -1,12 +1,7 @@
+import os
 from flask import Flask, render_template, send_from_directory
 
 app = Flask(__name__)
-
-@app.after_request
-def add_header(response):
-    if response.headers.get('Content-Type', '').startswith('image/'):
-        response.headers['Content-Type'] = 'image/svg+xml'
-    return response
 
 @app.route('/')
 def index():
@@ -16,10 +11,10 @@ def index():
 def manifest():
     return send_from_directory('static', 'manifest.json')
 
-# Route per servire le icone
-@app.route('/static/images/<path:filename>')
-def serve_icon(filename):
-    return send_from_directory('static/images', filename)
+@app.route('/sw.js')
+def service_worker():
+    return send_from_directory('static', 'sw.js')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = int(os.getenv("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

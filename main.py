@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template, send_from_directory
 
 app = Flask(__name__)
 
@@ -11,6 +11,11 @@ def add_header(response):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# Route per servire le icone
+@app.route('/static/icons/<path:filename>')
+def serve_icon(filename):
+    return send_from_directory('static/icons', filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

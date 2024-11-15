@@ -13,9 +13,9 @@ def index():
     return render_template('index.html')
 
 # Route per servire le icone
-@app.route('/static/icons/<path:filename>')
+@app.route('/static/images/<path:filename>')
 def serve_icon(filename):
-    return send_from_directory('static/icons', filename)
+    return send_from_directory('static/images', filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

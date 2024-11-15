@@ -12,6 +12,10 @@ def add_header(response):
 def index():
     return render_template('index.html')
 
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory('static', 'manifest.json')
+
 # Route per servire le icone
 @app.route('/static/images/<path:filename>')
 def serve_icon(filename):

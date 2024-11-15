@@ -11,6 +11,11 @@ def index():
 def manifest():
     return send_from_directory('static', 'manifest.json')
 
+# Route per servire i file statici
+@app.route('/static/images/<path:filename>')
+def serve_icon(filename):
+    return send_from_directory('static/images', filename)
+
 @app.route('/sw.js')
 def service_worker():
     return send_from_directory('static', 'sw.js')
